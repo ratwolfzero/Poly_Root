@@ -132,7 +132,7 @@ def plot_roots(roots, equation):
     # Original plotting style: lets Matplotlib adjust y-limits automatically
     plt.axis("equal")
 
-    plt.title(f"Roots in Complex Plane\n{equation}")
+    plt.title(f"Roots in Complex Plane\n{equation}", fontsize=10)
     plt.xlabel("Real")
     plt.ylabel("Imaginary")
     plt.legend()
