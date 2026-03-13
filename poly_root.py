@@ -1,13 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpmath import mp, mpf, matrix, eig
-import warnings
-
-# Optional: suppress the harmless Matplotlib warning
-warnings.filterwarnings(
-    "ignore",
-    message="Ignoring fixed x limits to fulfill fixed data aspect"
-)
 
 
 def get_coefficients():
