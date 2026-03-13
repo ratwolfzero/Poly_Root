@@ -1,127 +1,154 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpmath import mp, mpf, matrix, eig
+import warnings
+
+# Optional: suppress the harmless Matplotlib warning
+warnings.filterwarnings(
+    "ignore",
+    message="Ignoring fixed x limits to fulfill fixed data aspect"
+)
 
 
-def solve_and_plot(dps=50):  # Allow customizable precision
-    mp.dps = dps  # Set decimal precision for robustness against ill-conditioning
-
-    print("--- Robust Companion Matrix Polynomial Solver ---")
-    print("Enter coefficients (e.g., '1 0 -4' for x^2 - 4 = 0)")
-
-    try:
-        user_input = input("Coefficients: ").strip()
+def get_coefficients():
+    """Prompt user until valid coefficient input is provided."""
+    while True:
+        user_input = input("Coefficients (space separated): ").strip()
         if not user_input:
-            return
-
-        # Convert to list of mpf for high precision
-        raw_coeffs = [mpf(x) for x in user_input.split()]
-        # Trim leading zeros (highest degree non-zero)
+            print("Please enter at least two numbers.")
+            continue
+        try:
+            coeffs = [mpf(x) for x in user_input.split()]
+        except ValueError:
+            print("Invalid input. Please enter numbers separated by spaces.")
+            continue
+        # Trim leading zeros
         i = 0
-        while i < len(raw_coeffs) - 1 and raw_coeffs[i] == 0:
+        while i < len(coeffs) - 1 and coeffs[i] == 0:
             i += 1
-        coeffs = raw_coeffs[i:]
-
-        # Validation: Need at least two coefficients
+        coeffs = coeffs[i:]
         if len(coeffs) < 2:
-            print("Error: Need at least two coefficients for a valid polynomial.")
-            return
+            print("Need at least two coefficients.")
+            continue
+        return coeffs
 
-        # Build equation string with only non-zero terms
-        n = len(coeffs) - 1  # degree
-        terms = []
-        for i in range(n + 1):
-            c = coeffs[i]
-            if c == 0:
-                continue
-            deg = n - i
-            # Sign handling
-            if not terms:
-                sign = '' if c > 0 else '-'
-            else:
-                sign = ' + ' if c > 0 else ' - '
-            abs_c = abs(c)
-            # Coefficient string
-            if deg == 0 or abs_c != 1:
-                coeff_str = mp.nstr(abs_c, 4)
-            else:
-                coeff_str = ''
-            # Variable part
-            if deg > 1:
-                var_str = f'x^{deg}'
-            elif deg == 1:
-                var_str = 'x'
-            else:
-                var_str = ''
-            term = f"{sign}{coeff_str}{var_str}"
-            terms.append(term)
-        equation = ''.join(terms) + ' = 0'
 
-        # 1. Normalize to monic
-        leading = coeffs[0]
-        if leading == 0:
-            print("Error: Leading coefficient cannot be zero.")
-            return
-        # Coefficients for companion (without leading 1)
-        a = [c / leading for c in coeffs[1:]]
-        n = len(a)
-
-        # 2. Build the Companion Matrix
-        if n == 1:
-            # Linear: x + a0 = 0 => root = -a0
-            roots = [-a[0]]
-            roots_np = np.array(roots, dtype=complex)  # For plotting
+def polynomial_string(coeffs):
+    """Create a readable polynomial string."""
+    n = len(coeffs) - 1
+    terms = []
+    for i, c in enumerate(coeffs):
+        if c == 0:
+            continue
+        deg = n - i
+        if not terms:
+            sign = "" if c > 0 else "-"
         else:
-            # Create companion matrix
-            C = matrix(n, n)
-            for row in range(1, n):
-                C[row, row-1] = mpf(1)
-            for row in range(n):
-                C[row, n-1] = -a[n-1 - row]  # Reversed for standard companion
+            sign = " + " if c > 0 else " - "
+        abs_c = abs(c)
+        coeff_str = mp.nstr(abs_c, 4) if deg == 0 or abs_c != 1 else ""
+        var_str = f"x^{deg}" if deg > 1 else ("x" if deg == 1 else "")
+        terms.append(f"{sign}{coeff_str}{var_str}")
+    return "".join(terms) + " = 0"
 
-            # Compute eigenvalues (roots) with high precision
-            eigenvalues = eig(C, left=False, right=False)
 
-            # Convert to Python complex for plotting
-            roots = [complex(ev.real, ev.imag) for ev in eigenvalues]
-            roots_np = np.array(roots)
+def build_companion(coeffs):
+    """Construct companion matrix."""
+    leading = coeffs[0]
+    a = [c / leading for c in coeffs[1:]]
+    n = len(a)
+    if n == 1:
+        return None, [-a[0]]  # Linear
+    C = matrix(n)
+    for row in range(1, n):
+        C[row, row - 1] = mpf(1)
+    for row in range(n):
+        C[row, n - 1] = -a[n - 1 - row]
+    return C, None
 
-        # Sort roots by real part, then imag (groups conjugates and orders reals)
-        roots_np = np.sort_complex(roots_np)
 
-        # 3. Display Results
-        print(f"\nPolynomial Degree: {n}")
-        print(f"Equation: {equation}")
-        print("-" * 30)
-        for i, r in enumerate(roots_np, 1):
-            print(
-                f"Root {i}: {r.real:10.4f} {'+' if r.imag >= 0 else '-'} {abs(r.imag):.4f}j")
+def compute_roots(coeffs):
+    """Compute roots using companion matrix."""
+    C, linear_root = build_companion(coeffs)
+    if linear_root is not None:
+        roots = linear_root
+    else:
+        eigenvalues = eig(C, left=False, right=False)
+        roots = [complex(ev.real, ev.imag) for ev in eigenvalues]
+    roots_np = np.array(roots, dtype=complex)
+    roots_np = np.sort_complex(roots_np)
+    return roots_np
 
-        # 4. Plotting
-        plt.figure(figsize=(8, 8))
-        plt.axhline(0, color='black', lw=1)
-        plt.axvline(0, color='black', lw=1)
 
-        # Plot roots
-        plt.scatter(roots_np.real, roots_np.imag, color='red',
-                    marker='.', s=100, label='Roots', zorder=5)
+def poly_eval(coeffs, x):
+    """Evaluate polynomial using Horner's method."""
+    p = mpf(0)
+    for c in coeffs:
+        p = p * x + c
+    return p
 
-        # Unit Circle for reference
-        t = np.linspace(0, 2*np.pi, 100)
-        plt.plot(np.cos(t), np.sin(t), ls='--', color='gray',
-                 alpha=0.5, label='Unit Circle')
-        plt.grid(True, linestyle=':', alpha=0.6)
-        plt.axis('equal')
-        plt.title(f"Roots in Complex Plane\n{equation}")
-        plt.xlabel("Real")
-        plt.ylabel("Imaginary")
-        plt.legend()
-        plt.show()
 
-    except ValueError:
-        print("Error: Please enter only numbers separated by spaces.")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+def print_roots(coeffs, roots):
+    """Display roots and residuals."""
+    print("-" * 40)
+    for i, r in enumerate(roots, 1):
+        mp_root = mp.mpc(r.real, r.imag)
+        residual = abs(poly_eval(coeffs, mp_root))
+        print(
+            f"Root {i:2d}: {r.real:10.6f} {'+' if r.imag >= 0 else '-'} {abs(r.imag):.6f}j"
+            f"   |p(r)| ≈ {mp.nstr(residual, 4)}"
+        )
+
+
+def plot_roots(roots, equation):
+    """Plot roots in complex plane, using original axis handling."""
+    plt.figure(figsize=(8, 8))
+    plt.axhline(0, color="black", lw=1)
+    plt.axvline(0, color="black", lw=1)
+
+    plt.scatter(
+        roots.real,
+        roots.imag,
+        color="red",
+        marker=".",
+        s=100,
+        label="Roots",
+        zorder=5,
+    )
+
+    # Unit circle reference
+    t = np.linspace(0, 2 * np.pi, 200)
+    plt.plot(
+        np.cos(t),
+        np.sin(t),
+        ls="--",
+        color="gray",
+        alpha=0.5,
+        label="Unit Circle",
+    )
+
+    plt.grid(True, linestyle=":", alpha=0.6)
+
+    # Original plotting style: lets Matplotlib adjust y-limits automatically
+    plt.axis("equal")
+
+    plt.title(f"Roots in Complex Plane\n{equation}")
+    plt.xlabel("Real")
+    plt.ylabel("Imaginary")
+    plt.legend()
+    plt.show()
+
+
+def solve_and_plot(dps=100):
+    mp.dps = dps
+    print("\n--- Robust Companion Matrix Polynomial Solver ---")
+    coeffs = get_coefficients()
+    equation = polynomial_string(coeffs)
+    roots = compute_roots(coeffs)
+    print(f"\nPolynomial Degree: {len(coeffs) - 1}")
+    print(f"Equation: {equation}")
+    print_roots(coeffs, roots)
+    plot_roots(roots, equation)
 
 
 if __name__ == "__main__":
