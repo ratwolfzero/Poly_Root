@@ -27,21 +27,41 @@ def get_coefficients():
 
 
 def polynomial_string(coeffs):
-    """Create a readable polynomial string."""
+    """Create a readable polynomial string without .0 for integers."""
+    
+    def fmt(num):
+        # Print integers without decimal
+        if num == int(num):
+            return str(int(num))
+        return mp.nstr(num, 4)
+
     n = len(coeffs) - 1
     terms = []
+
     for i, c in enumerate(coeffs):
         if c == 0:
             continue
+
         deg = n - i
+
         if not terms:
             sign = "" if c > 0 else "-"
         else:
             sign = " + " if c > 0 else " - "
+
         abs_c = abs(c)
-        coeff_str = mp.nstr(abs_c, 4) if deg == 0 or abs_c != 1 else ""
+
+        if deg == 0:
+            coeff_str = fmt(abs_c)
+        elif abs_c == 1:
+            coeff_str = ""
+        else:
+            coeff_str = fmt(abs_c)
+
         var_str = f"x^{deg}" if deg > 1 else ("x" if deg == 1 else "")
+
         terms.append(f"{sign}{coeff_str}{var_str}")
+
     return "".join(terms) + " = 0"
 
 
