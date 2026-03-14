@@ -159,3 +159,6 @@ problem of polynomial root finding**. Instead, it focuses on **reducing
 numerical rounding errors** using high‑precision arithmetic, which in
 practice leads to far more reliable root approximations for difficult
 polynomials.
+
+Further Reasing
+[Medium](https://medium.com/@ratwolf/the-floating-point-catastrophe-9e795d46cfb1)
