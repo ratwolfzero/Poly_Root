@@ -181,7 +181,7 @@ def plot_roots(roots, equation):
     plt.show()
 
 
-def solve_and_plot(dps=16):
+def solve_and_plot(dps=100):
 
     mp.dps = dps
 
