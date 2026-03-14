@@ -10,7 +10,7 @@ def get_coefficients():
 
         if not user_input:
             print("Please enter at least two numbers.")
-            continue                                              
+            continue
 
         try:
             coeffs = [mpf(x) for x in user_input.split()]
@@ -23,7 +23,7 @@ def get_coefficients():
         while i < len(coeffs) - 1 and coeffs[i] == 0:
             i += 1
         coeffs = coeffs[i:]
-																  
+
         if len(coeffs) < 2:
             print("Need at least two coefficients.")
             continue
@@ -34,7 +34,7 @@ def get_coefficients():
 def polynomial_string(coeffs):
     """Create a readable polynomial string."""
 
-    def fmt(num):                                       
+    def fmt(num):
         if num == int(num):
             return str(int(num))
         return mp.nstr(num, 4)
@@ -71,12 +71,12 @@ def polynomial_string(coeffs):
 
 
 def build_companion(coeffs):
-    """Construct companion matrix."""                                                
+    """Construct companion matrix."""
     leading = coeffs[0]
     a = [c / leading for c in coeffs[1:]]
 
     n = len(a)
-																					 
+
     if n == 1:
         return None, [-a[0]]
 
@@ -163,14 +163,14 @@ def plot_roots(roots, equation):
     plt.plot(
         np.cos(t),
         np.sin(t),
-        ls="--",                                              
+        ls="--",
         color="gray",
         alpha=0.5,
         label="Unit Circle",
     )
 
     plt.grid(True, linestyle=":", alpha=0.6)
-																  
+
     plt.axis("equal")
 
     plt.title(f"Roots in Complex Plane\n{equation}", fontsize=10)
