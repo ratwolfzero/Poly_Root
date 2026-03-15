@@ -41,8 +41,9 @@ limitations** in standard numerical implementations. By using
 effects and therefore improves the stability of the computed roots.
 
 As a classic illustration, the Wilkinson Polynomial ($n = 20$) shows
-that even extremely small perturbations (e.g., modifying the $x^{19}$
-coefficient by $2^{-23}$) can shift real roots into the complex plane.
+that even extremely small perturbations (for example modifying the
+$x^{19}$ coefficient by $2^{-23}$) can shift real roots into the complex
+plane.
 
 ### Multiple Roots and Sensitivity
 
@@ -57,7 +58,7 @@ $$
 This means even extremely small coefficient perturbations may split a
 multiple root into a cluster of nearby roots.
 
-High-precision arithmetic helps ensure that such behavior reflects the
+High‑precision arithmetic helps ensure that such behavior reflects the
 **true mathematical sensitivity of the polynomial**, rather than
 artificial numerical noise.
 
@@ -65,8 +66,8 @@ artificial numerical noise.
 
 ## 2. Methodology
 
-Instead of relying on iterative root-polishing techniques such as
-Newton-Raphson or specialized polynomial solvers like Jenkins--Traub,
+Instead of relying on iterative root‑polishing techniques such as
+Newton--Raphson or specialized polynomial solvers like Jenkins--Traub,
 this solver computes all roots simultaneously using the **Companion
 Matrix Eigenvalue Method**.
 
@@ -78,7 +79,7 @@ by the leading coefficient.
 ### 2. Matrix Construction
 
 A companion matrix $C$ is constructed such that its **characteristic
-polynomial equals the normalized polynomial**:
+polynomial corresponds to the normalized polynomial**:
 
 $$
 C =
@@ -91,18 +92,21 @@ C =
 \end{pmatrix}
 $$
 
-### 3. High-Precision Eigenvalue Solve
+The eigenvalues of this matrix correspond to the **roots of the
+polynomial**.
 
-The eigenvalues $\lambda$ of $C$ are computed using `mpmath.eig`.
+### 3. High‑Precision Eigenvalue Solve
 
-These eigenvalues are exactly the **roots of the polynomial**.
+The eigenvalues of the companion matrix are computed using `mpmath.eig`,
+which operates with arbitrary precision.
 
 By default
 
     mp.dps = 100
 
-This provides **100 decimal digits of working precision**, significantly
-reducing rounding errors compared to standard double precision.
+This provides **100 decimal digits of working precision**, which
+significantly reduces rounding errors compared to standard double
+precision.
 
 Increasing `mp.dps` increases the precision used during both the
 eigenvalue computation and polynomial evaluation.
@@ -118,13 +122,13 @@ $$
 This residual measures **how well the computed value satisfies the
 polynomial equation**.
 
-Residual magnitudes often scale with the working precision (e.g. roughly
-$10^{-dps}$), but the exact value may vary depending on the structure of
-the polynomial and numerical conditioning.
+Residual magnitudes often scale with the working precision (typically
+around $10^{-dps}$), but the exact value depends on the structure of the
+polynomial and numerical conditioning.
 
 A small residual indicates that $P(r) \approx 0$, but **does not always
 guarantee that the root itself is highly accurate**, particularly for
-ill-conditioned polynomials or multiple roots.
+ill‑conditioned polynomials or multiple roots.
 
 ------------------------------------------------------------------------
 
@@ -132,11 +136,11 @@ ill-conditioned polynomials or multiple roots.
 
 - **Arbitrary Precision:** Default 100 decimal places (configurable)
 - **Improved Numerical Stability:** Mitigates rounding errors common
-    in double-precision implementations
+    in double‑precision implementations
 - **Modular Structure:** Separate functions for input, matrix
     construction, eigenvalue computation, evaluation, printing, and
     plotting
-- **Robust Input Handling:** Re-prompts until valid space-separated
+- **Robust Input Handling:** Re‑prompts until valid space‑separated
     numeric coefficients are entered
 - **Residual Verification:** Displays $|P(r)|$ for each root
 - **Complex Visualization:** Roots are plotted in the complex plane
@@ -144,7 +148,7 @@ ill-conditioned polynomials or multiple roots.
 
 The plotting logic intentionally remains simple to avoid distortions
 when visualizing **highly asymmetric root distributions**, such as those
-produced by Wilkinson-type polynomials.
+produced by Wilkinson‑type polynomials.
 
 ------------------------------------------------------------------------
 
@@ -162,17 +166,49 @@ The program outputs
 - Polynomial equation string
 - Computed roots
 - Residual values $|P(r)|$
-- A complex-plane plot of the roots with a unit circle reference
+- A complex‑plane plot of the roots with a unit circle reference
 
 ------------------------------------------------------------------------
 
-## 5. Test Cases
+## 5. Interpreting Residuals
+
+Residuals provide a useful **sanity check** for computed roots.
+
+If the working precision is
+
+    mp.dps = 100
+
+typical residual magnitudes may fall roughly in the range
+
+$$
+10^{-98} \text{ to } 10^{-102}
+$$
+
+depending on rounding behavior and cancellation effects.
+
+However:
+
+- A **very small residual does not guarantee high root accuracy**
+- Ill‑conditioned polynomials may produce **accurate equations but
+    inaccurate roots**
+- Multiple roots are particularly sensitive to perturbations
+
+Residuals therefore measure **equation satisfaction**, not necessarily
+**root correctness**.
+
+------------------------------------------------------------------------
+
+## 6. Test Cases
 
 ### 1. Wilkinson's Polynomial (Roots 1 through 20)
 
-    1 -210 20615 -1256850 53327946 -1672280820 40171771630 -756111184500 11310276995381 -135585182899530 1307535010540395 -10142299865511450 63030812099294896 -311333643161390640 1206647803780373360 -3599979517947607200 8037811822645051776 -12870931245150988800 13803759753640704000 -8752948036761600000 2432902008176640000
+    1 -210 20615 -1256850 53327946 -1672280820 40171771630 -756111184500
+    11310276995381 -135585182899530 1307535010540395 -10142299865511450
+    63030812099294896 -311333643161390640 1206647803780373360
+    -3599979517947607200 8037811822645051776 -12870931245150988800
+    13803759753640704000 -8752948036761600000 2432902008176640000
 
-### 2. Multiple Clustered Roots $((x-1)^10)$
+### 2. Multiple Clustered Roots $((x-1)^{10})$
 
     1 -10 45 -120 210 -252 210 -120 45 -10 1
 
@@ -182,52 +218,13 @@ The program outputs
 
 ------------------------------------------------------------------------
 
-## 6. Interpreting Residuals and Precision
-
-Residual values provide useful diagnostic information but should be
-interpreted carefully.
-
-In arbitrary-precision arithmetic with `mp.dps = D`, rounding errors
-typically occur at roughly
-
-$$
-10^{-D}
-$$
-
-Therefore residual magnitudes often appear near this scale.
-
-However several factors influence the exact value:
-
-- Polynomial structure
-- Root multiplicity
-- Conditioning of the polynomial
-- Cancellation during polynomial evaluation
-
-For well-conditioned polynomials, small residuals usually indicate that
-the computed roots are accurate.
-
-For ill-conditioned polynomials---especially those with **multiple
-roots**---tiny residuals may still coexist with noticeable root errors.
-This occurs because the polynomial becomes extremely flat near such
-roots.
-
-In other words:
-
-- **Residuals measure equation satisfaction**
-- **They do not directly measure root accuracy**
-
-Consequently residuals should be interpreted as **diagnostic indicators
-rather than absolute guarantees of correctness**.
-
-------------------------------------------------------------------------
-
 ## Key Idea
 
 The solver does **not attempt to solve the fundamental conditioning
 problem of polynomial root finding**.
 
 Instead, it focuses on **reducing numerical rounding errors** using
-high-precision arithmetic, which in practice leads to far more reliable
+high‑precision arithmetic, which in practice leads to far more reliable
 root approximations for difficult polynomials.
 
 ------------------------------------------------------------------------
