@@ -104,13 +104,7 @@ def compute_roots(coeffs):
     # Sort roots deterministically
     roots_mp.sort(key=lambda z: (mp.re(z), mp.im(z)))
 
-    # Convert to numpy complex only for plotting
-    roots_np = np.array(
-        [complex(float(mp.re(r)), float(mp.im(r))) for r in roots_mp],
-        dtype=complex,
-    )
-
-    return roots_mp, roots_np
+    return roots_mp
 
 
 def poly_eval(coeffs, x):
@@ -126,7 +120,7 @@ def poly_eval(coeffs, x):
 def print_roots(coeffs, roots_mp):
     """Display roots and high-precision residuals."""
     print("-" * 40)
-
+															
     for i, r in enumerate(roots_mp, 1):
 
         residual = abs(poly_eval(coeffs, r))
@@ -141,16 +135,26 @@ def print_roots(coeffs, roots_mp):
         )
 
 
-def plot_roots(roots, equation):
+def mpc_to_numpy_complex(roots_mp):
+    """Convert a list of mpmath mpc numbers to a NumPy complex array."""
+    return np.array(
+        [complex(float(mp.re(z)), float(mp.im(z))) for z in roots_mp],           
+        dtype=complex
+    )
+
+
+def plot_roots(roots_mp, equation):
     """Plot roots in complex plane."""
+    roots_np = mpc_to_numpy_complex(roots_mp)
+
     plt.figure(figsize=(8, 8))
 
     plt.axhline(0, color="black", lw=1)
     plt.axvline(0, color="black", lw=1)
 
     plt.scatter(
-        roots.real,
-        roots.imag,
+        roots_np.real,
+        roots_np.imag,
         color="red",
         marker=".",
         s=100,
@@ -158,7 +162,7 @@ def plot_roots(roots, equation):
         zorder=5,
     )
 
-    t = np.linspace(0, 2 * np.pi, 200)
+    t = np.linspace(0, 2 * np.pi, 200)                                           
 
     plt.plot(
         np.cos(t),
@@ -173,7 +177,7 @@ def plot_roots(roots, equation):
 
     plt.axis("equal")
 
-    plt.title(f"Roots in Complex Plane\n{equation}", fontsize=10)
+    plt.title(f"Roots in Complex Plane\n{equation}", fontsize=10)                
     plt.xlabel("Real")
     plt.ylabel("Imaginary")
     plt.legend()
@@ -182,7 +186,6 @@ def plot_roots(roots, equation):
 
 
 def solve_and_plot(dps=100):
-
     mp.dps = dps
 
     print("\n--- Robust Companion Matrix Polynomial Solver ---")
@@ -191,14 +194,14 @@ def solve_and_plot(dps=100):
 
     equation = polynomial_string(coeffs)
 
-    roots_mp, roots_np = compute_roots(coeffs)
+    roots_mp = compute_roots(coeffs)
 
     print(f"\nPolynomial Degree: {len(coeffs) - 1}")
     print(f"Equation: {equation}")
 
     print_roots(coeffs, roots_mp)
 
-    plot_roots(roots_np, equation)
+    plot_roots(roots_mp, equation)
 
 
 if __name__ == "__main__":
