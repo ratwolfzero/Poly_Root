@@ -120,7 +120,7 @@ def poly_eval(coeffs, x):
 def print_roots(coeffs, roots_mp):
     """Display roots and high-precision residuals."""
     print("-" * 40)
-															
+
     for i, r in enumerate(roots_mp, 1):
 
         residual = abs(poly_eval(coeffs, r))
@@ -138,7 +138,7 @@ def print_roots(coeffs, roots_mp):
 def mpc_to_numpy_complex(roots_mp):
     """Convert a list of mpmath mpc numbers to a NumPy complex array."""
     return np.array(
-        [complex(float(mp.re(z)), float(mp.im(z))) for z in roots_mp],           
+        [complex(float(mp.re(z)), float(mp.im(z))) for z in roots_mp],
         dtype=complex
     )
 
@@ -162,7 +162,7 @@ def plot_roots(roots_mp, equation):
         zorder=5,
     )
 
-    t = np.linspace(0, 2 * np.pi, 200)                                           
+    t = np.linspace(0, 2 * np.pi, 200)
 
     plt.plot(
         np.cos(t),
@@ -177,7 +177,7 @@ def plot_roots(roots_mp, equation):
 
     plt.axis("equal")
 
-    plt.title(f"Roots in Complex Plane\n{equation}", fontsize=10)                
+    plt.title(f"Roots in Complex Plane\n{equation}", fontsize=10)
     plt.xlabel("Real")
     plt.ylabel("Imaginary")
     plt.legend()
