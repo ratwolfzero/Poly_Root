@@ -3,32 +3,40 @@ import matplotlib.pyplot as plt
 from mpmath import mp, mpf, mpc, matrix, eig
 
 
+def parse_coefficients(text):
+    """Parse coefficient string into a valid coefficient list."""
+    parts = text.strip().split()
+
+    if not parts:
+        raise ValueError("Please enter at least two numbers.")
+
+    try:
+        coeffs = [mpf(x) for x in parts]
+    except ValueError:
+        raise ValueError(
+            "Invalid input. Please enter numbers separated by spaces.")
+
+    # Trim leading zeros
+    i = 0
+    while i < len(coeffs) - 1 and coeffs[i] == 0:
+        i += 1
+
+    coeffs = coeffs[i:]
+
+    if len(coeffs) < 2:
+        raise ValueError("Need at least two coefficients.")
+
+    return coeffs
+
+
 def get_coefficients():
     """Prompt user until valid coefficient input is provided."""
     while True:
-        user_input = input("Coefficients (space separated): ").strip()
-
-        if not user_input:
-            print("Please enter at least two numbers.")
-            continue
-
         try:
-            coeffs = [mpf(x) for x in user_input.split()]
-        except ValueError:
-            print("Invalid input. Please enter numbers separated by spaces.")
-            continue
-
-        # Trim leading zeros
-        i = 0
-        while i < len(coeffs) - 1 and coeffs[i] == 0:
-            i += 1
-        coeffs = coeffs[i:]
-
-        if len(coeffs) < 2:
-            print("Need at least two coefficients.")
-            continue
-
-        return coeffs
+            text = input("Coefficients (space separated): ")
+            return parse_coefficients(text)
+        except ValueError as e:
+            print(e)
 
 
 def polynomial_string(coeffs):
