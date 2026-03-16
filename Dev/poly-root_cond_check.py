@@ -167,7 +167,9 @@ def plot_roots(roots_mp, equation):
     plt.show()
 
 
-def solve_and_plot(dps=100):
+def solve_and_plot(dps=10):
+
+    mp.dps = dps
 
     print("\n--- Robust Companion Matrix Polynomial Solver ---")
     print("   (safe condition number + full singularity protection)")
