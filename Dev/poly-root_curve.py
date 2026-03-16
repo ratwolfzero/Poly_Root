@@ -3,8 +3,7 @@ from matplotlib.widgets import Button
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib
-matplotlib.use('TkAgg')          # ← CRITICAL FIX FOR macOS
-# (This forces the reliable TkAgg backend so multiple independent windows + buttons work without crashing)
+matplotlib.use('TkAgg')  # Ensures TkAgg backend works well on macOS
 
 
 def parse_coefficients(text):
@@ -15,8 +14,7 @@ def parse_coefficients(text):
     try:
         coeffs = [mpf(x) for x in parts]
     except ValueError:
-        raise ValueError(
-            "Invalid input. Please enter numbers separated by spaces.")
+        raise ValueError("Invalid input. Enter numbers separated by spaces.")
     # Trim leading zeros
     i = 0
     while i < len(coeffs) - 1 and coeffs[i] == 0:
@@ -124,7 +122,7 @@ def mpc_to_numpy_complex(roots_mp):
 
 
 def plot_roots(roots_mp, equation, coeffs):
-    """Complex plane plot with the button moved to avoid legend/title overlap."""
+    """Complex plane plot with a button to open polynomial curve."""
     roots_np = mpc_to_numpy_complex(roots_mp)
     plt.figure(figsize=(8, 8))
     plt.axhline(0, color="black", lw=1)
@@ -141,10 +139,9 @@ def plot_roots(roots_mp, equation, coeffs):
     plt.title(f"Roots in Complex Plane\n{equation}", fontsize=10, pad=20)
     plt.xlabel("Real")
     plt.ylabel("Imaginary")
-    plt.legend(loc='best')  # Moved legend to avoid top-right button
+    plt.legend(loc='best')
 
-    # === Toggle button (Top-Right placement) ===
-    # [left, bottom, width, height]
+    # Toggle button (Top-Right placement)
     button_ax = plt.axes([0.75, 0.02, 0.15, 0.03])
     button = Button(button_ax, 'Poly Curve',
                     color='lightgoldenrodyellow', hovercolor='gold')
@@ -157,9 +154,10 @@ def plot_roots(roots_mp, equation, coeffs):
 
 
 def plot_polynomial_curve(coeffs, roots_mp, equation):
-    """Independent window with robust scaling and duplicate prevention."""
+    """Smarter, automatically scaled polynomial curve."""
     fig_name = "PolyCurveWindow"
 
+    # Avoid opening duplicates
     if plt.fignum_exists(fig_name):
         fig = plt.figure(fig_name)
         try:
@@ -168,44 +166,35 @@ def plot_polynomial_curve(coeffs, roots_mp, equation):
             pass
         return
 
-    # 1. Compute scaling based on root distribution
-    real_parts = [float(mp.re(r)) for r in roots_mp]
-    magnitudes = [float(mp.fabs(r)) for r in roots_mp]
-
-    # Center the view on the average real location of roots
-    center_x = sum(real_parts) / len(real_parts)
-    # Determine the spread (how far roots are from that center)
-    max_dist = max([abs(x - center_x) for x in real_parts] + [1.0])
-
-    # Use the larger of: the root spread OR the root distance from origin
-    # This handles both (x-10^6)^2 and x^2 + 10^6
-    scale_factor = max(max_dist, max(magnitudes) * 0.2)
-
-    x_min, x_max = center_x - 1.5 * scale_factor, center_x + 1.5 * scale_factor
-
-    # 2. Evaluate
     coeffs_float = np.array([float(c) for c in coeffs], dtype=float)
+    real_parts = [float(mp.re(r)) for r in roots_mp]
+
+    # --- Smarter X-axis scaling ---
+    spread = max(real_parts) - min(real_parts)
+    x_center = sum(real_parts) / len(real_parts)
+    x_pad = 1.5 * max(spread, 1.0)  # at least 1.0 unit padding
+    x_min = x_center - x_pad
+    x_max = x_center + x_pad
     x_vals = np.linspace(x_min, x_max, 2000)
     y_vals = np.polyval(coeffs_float, x_vals)
 
-    # 3. Dynamic Y-Scaling (The 'Symmetry' Fix)
-    # We look at the y-values at the edges to ensure the curve 'fills' the box
-    y_at_edges = max(abs(y_vals[0]), abs(y_vals[-1]))
-    y_limit = y_at_edges if y_at_edges > 1e-9 else 1.0
+    # --- Smarter Y-axis scaling (95th percentile) ---
+    y_abs_sorted = np.sort(np.abs(y_vals))
+    y_limit = max(y_abs_sorted[int(0.95*len(y_abs_sorted))], 1e-9)
 
-    # 4. Plot
+    # --- Plot ---
     plt.figure(num=fig_name, figsize=(10, 6))
     plt.plot(x_vals, y_vals, color="blue", lw=2, label="p(x)")
     plt.axhline(0, color="black", lw=1)
     plt.axvline(0, color="black", lw=0.5, ls="--")
 
-    # Mark real roots only
+    # Mark real roots
     tol = 1e-7
     real_roots_to_mark = [r for i, r in enumerate(
         real_parts) if abs(float(mp.im(roots_mp[i]))) < tol]
     if real_roots_to_mark:
-        plt.plot(real_roots_to_mark, [
-                 0]*len(real_roots_to_mark), "ro", markersize=8, label="Real Roots")
+        plt.plot(real_roots_to_mark, [0]*len(real_roots_to_mark),
+                 "ro", markersize=8, label="Real Roots")
 
     plt.grid(True, linestyle=":", alpha=0.7)
     plt.title(f"Polynomial Curve p(x)\n{equation}", fontsize=11)
@@ -226,7 +215,7 @@ def solve_and_plot(dps=100):
     print(f"Equation: {equation}")
     print_roots(coeffs, roots_mp)
 
-    # === Complex-plane plot with built-in button ===
+    # Complex-plane plot with built-in button
     plot_roots(roots_mp, equation, coeffs)
 
 
