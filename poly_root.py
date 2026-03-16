@@ -194,6 +194,15 @@ def plot_roots(roots_mp, equation):
 
 
 def solve_and_plot(dps=100):
+
+    # Enforce minimum precision
+    if dps < 16:
+        raise ValueError(
+            "mp.dps must be at least 16. "
+            "Lower precision may lead to a numerically singular companion matrix "
+            "and unreliable roots."
+        )
+
     mp.dps = dps
 
     print("\n--- Robust Companion Matrix Polynomial Solver ---")
