@@ -11,7 +11,8 @@ def parse_coefficients(text):
     try:
         coeffs = [mpf(x) for x in parts]
     except ValueError:
-        raise ValueError("Invalid input. Please enter numbers separated by spaces.")
+        raise ValueError(
+            "Invalid input. Please enter numbers separated by spaces.")
     # Trim leading zeros
     i = 0
     while i < len(coeffs) - 1 and coeffs[i] == 0:
@@ -166,10 +167,7 @@ def plot_roots(roots_mp, equation):
     plt.show()
 
 
-def solve_and_plot(dps=1000):
-    if dps < 16:
-        raise ValueError("mp.dps must be at least 16.")
-    mp.dps = dps
+def solve_and_plot(dps=100):
 
     print("\n--- Robust Companion Matrix Polynomial Solver ---")
     print("   (safe condition number + full singularity protection)")
@@ -186,12 +184,14 @@ def solve_and_plot(dps=1000):
     if cond is not None:
         if mp.isinf(cond):
             print(f"\nCompanion matrix condition number: ∞")
-            print("   → Matrix is singular (e.g. root(s) exactly at 0 or multiple roots).")
+            print(
+                "   → Matrix is singular (e.g. root(s) exactly at 0 or multiple roots).")
             print("   → Roots computed successfully, but they are extremely sensitive.")
         elif cond > mpf('1e12'):
             print(f"\nCompanion matrix condition number: {mp.nstr(cond, 6)}")
             print("   → Polynomial is ill-conditioned. Roots may be very sensitive.")
-            print("   → Consider increasing dps (e.g. solve_and_plot(dps=500)) for better accuracy.")
+            print(
+                "   → Consider increasing dps (e.g. solve_and_plot(dps=500)) for better accuracy.")
 
     print_roots(coeffs, roots_mp)
     plot_roots(roots_mp, equation)

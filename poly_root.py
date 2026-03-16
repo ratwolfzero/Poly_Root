@@ -195,29 +195,14 @@ def plot_roots(roots_mp, equation):
 
 def solve_and_plot(dps=100):
 
-    # Enforce minimum precision
-    if dps < 16:
-        raise ValueError(
-            "mp.dps must be at least 16. "
-            "Lower precision may lead to a numerically singular companion matrix "
-            "and unreliable roots."
-        )
-
     mp.dps = dps
-
     print("\n--- Robust Companion Matrix Polynomial Solver ---")
-
     coeffs = get_coefficients()
-
     equation = polynomial_string(coeffs)
-
     roots_mp = compute_roots(coeffs)
-
     print(f"\nPolynomial Degree: {len(coeffs) - 1}")
     print(f"Equation: {equation}")
-
     print_roots(coeffs, roots_mp)
-
     plot_roots(roots_mp, equation)
 
 
