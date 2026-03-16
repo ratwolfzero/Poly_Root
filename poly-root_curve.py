@@ -6,8 +6,9 @@ import matplotlib
 matplotlib.use('TkAgg')  # Ensures TkAgg backend works well on macOS
 
 
+# --------------------- Polynomial Utilities ---------------------
+
 def parse_coefficients(text):
-    """Parse coefficient string into a valid coefficient list."""
     parts = text.strip().split()
     if not parts:
         raise ValueError("Please enter at least two numbers.")
@@ -26,7 +27,6 @@ def parse_coefficients(text):
 
 
 def get_coefficients():
-    """Prompt user until valid coefficient input is provided."""
     while True:
         try:
             text = input("Coefficients (space separated): ")
@@ -36,7 +36,6 @@ def get_coefficients():
 
 
 def polynomial_string(coeffs):
-    """Create a readable polynomial string."""
     def fmt(num):
         if num == int(num):
             return str(int(num))
@@ -64,7 +63,6 @@ def polynomial_string(coeffs):
 
 
 def build_companion(coeffs):
-    """Construct companion matrix."""
     leading = coeffs[0]
     a = [c / leading for c in coeffs[1:]]
     n = len(a)
@@ -79,20 +77,17 @@ def build_companion(coeffs):
 
 
 def compute_roots(coeffs):
-    """Compute roots using companion matrix."""
     C, linear_root = build_companion(coeffs)
     if linear_root is not None:
         roots_mp = [mpc(linear_root[0])]
     else:
         eigenvalues = eig(C, left=False, right=False)
         roots_mp = [mpc(ev) for ev in eigenvalues]
-    # Sort roots deterministically
     roots_mp.sort(key=lambda z: (mp.re(z), mp.im(z)))
     return roots_mp
 
 
 def poly_eval(coeffs, x):
-    """Evaluate polynomial using Horner's method."""
     p = mpf(0)
     for c in coeffs:
         p = p * x + c
@@ -100,7 +95,6 @@ def poly_eval(coeffs, x):
 
 
 def print_roots(coeffs, roots_mp):
-    """Display roots and high-precision residuals."""
     print("-" * 40)
     for i, r in enumerate(roots_mp, 1):
         residual = abs(poly_eval(coeffs, r))
@@ -114,22 +108,23 @@ def print_roots(coeffs, roots_mp):
 
 
 def mpc_to_numpy_complex(roots_mp):
-    """Convert a list of mpmath mpc numbers to a NumPy complex array."""
     return np.array(
         [complex(float(mp.re(z)), float(mp.im(z))) for z in roots_mp],
         dtype=complex
     )
 
 
+# --------------------- Plotting ---------------------
+
 def plot_roots(roots_mp, equation, coeffs):
-    """Complex plane plot with a button to open polynomial curve."""
     roots_np = mpc_to_numpy_complex(roots_mp)
-    plt.figure(figsize=(8, 8))
+    fig, ax = plt.subplots(figsize=(8, 8))
     plt.axhline(0, color="black", lw=1)
     plt.axvline(0, color="black", lw=1)
-    plt.scatter(roots_np.real, roots_np.imag, color="red",
-                marker=".", s=100, label="Roots", zorder=5)
+    points = ax.scatter(roots_np.real, roots_np.imag, color="red",
+                        marker=".", s=100, label="Roots", zorder=5)
 
+    # Unit circle
     t = np.linspace(0, 2 * np.pi, 200)
     plt.plot(np.cos(t), np.sin(t), ls="--", color="gray",
              alpha=0.5, label="Unit Circle")
@@ -141,23 +136,29 @@ def plot_roots(roots_mp, equation, coeffs):
     plt.ylabel("Imaginary")
     plt.legend(loc='best')
 
-    # Toggle button (Top-Right placement)
-    button_ax = plt.axes([0.75, 0.02, 0.15, 0.03])
-    button = Button(button_ax, 'Poly Curve',
-                    color='lightgoldenrodyellow', hovercolor='gold')
+    # --- Buttons ---
+    button_ax_poly = plt.axes([0.75, 0.02, 0.15, 0.03])
+    button_poly = Button(button_ax_poly, 'Poly Curve',
+                         color='lightgoldenrodyellow', hovercolor='gold')
+
+    button_ax_domain = plt.axes([0.58, 0.02, 0.15, 0.03])
+    button_domain = Button(button_ax_domain, 'Color Domain',
+                           color='lightgoldenrodyellow', hovercolor='gold')
 
     def open_poly(event):
         plot_polynomial_curve(coeffs, roots_mp, equation)
 
-    button.on_clicked(open_poly)
+    def open_domain(event):
+        plot_complex_color_domain(coeffs, equation)
+
+    button_poly.on_clicked(open_poly)
+    button_domain.on_clicked(open_domain)
+
     plt.show()
 
 
 def plot_polynomial_curve(coeffs, roots_mp, equation):
-    """Smarter, automatically scaled polynomial curve."""
     fig_name = "PolyCurveWindow"
-
-    # Avoid opening duplicates
     if plt.fignum_exists(fig_name):
         fig = plt.figure(fig_name)
         try:
@@ -169,20 +170,19 @@ def plot_polynomial_curve(coeffs, roots_mp, equation):
     coeffs_float = np.array([float(c) for c in coeffs], dtype=float)
     real_parts = [float(mp.re(r)) for r in roots_mp]
 
-    # --- Smarter X-axis scaling ---
+    # Smarter X-axis scaling
     spread = max(real_parts) - min(real_parts)
     x_center = sum(real_parts) / len(real_parts)
-    x_pad = 1.5 * max(spread, 1.0)  # at least 1.0 unit padding
+    x_pad = 1.5 * max(spread, 1.0)
     x_min = x_center - x_pad
     x_max = x_center + x_pad
     x_vals = np.linspace(x_min, x_max, 2000)
     y_vals = np.polyval(coeffs_float, x_vals)
 
-    # --- Smarter Y-axis scaling (95th percentile) ---
+    # Smarter Y-axis scaling (95th percentile)
     y_abs_sorted = np.sort(np.abs(y_vals))
     y_limit = max(y_abs_sorted[int(0.95*len(y_abs_sorted))], 1e-9)
 
-    # --- Plot ---
     plt.figure(num=fig_name, figsize=(10, 6))
     plt.plot(x_vals, y_vals, color="blue", lw=2, label="p(x)")
     plt.axhline(0, color="black", lw=1)
@@ -205,6 +205,36 @@ def plot_polynomial_curve(coeffs, roots_mp, equation):
     plt.show(block=False)
 
 
+def plot_complex_color_domain(coeffs, equation):
+    """Visualize polynomial in the complex plane using color domain (phase/magnitude)."""
+    coeffs_float = np.array([float(c) for c in coeffs], dtype=float)
+
+    # Grid in complex plane
+    res = 500
+    x = np.linspace(-3, 3, res)
+    y = np.linspace(-3, 3, res)
+    X, Y = np.meshgrid(x, y)
+    Z = X + 1j * Y
+    W = np.polyval(coeffs_float, Z)
+
+    # HSV coloring: hue = phase, value = magnitude
+    H = (np.angle(W) + np.pi) / (2*np.pi)
+    V = 1 - 1/(1 + np.abs(W)**0.3)  # adjust brightness for visibility
+    S = np.ones_like(H)
+    HSV = np.stack([H, S, V], axis=-1)
+    RGB = matplotlib.colors.hsv_to_rgb(HSV)
+
+    plt.figure(figsize=(6,6))
+    plt.imshow(RGB, extent=[x[0], x[-1], y[0], y[-1]], origin='lower')
+    plt.xlabel("Re(z)")
+    plt.ylabel("Im(z)")
+    plt.title(f"Complex Color Domain\n{equation}", fontsize=11)
+    plt.grid(False)
+    plt.show(block=False)
+
+
+# --------------------- Main Solver ---------------------
+
 def solve_and_plot(dps=100):
     mp.dps = dps
     print("\n--- Robust Companion Matrix Polynomial Solver ---")
@@ -214,8 +244,6 @@ def solve_and_plot(dps=100):
     print(f"\nPolynomial Degree: {len(coeffs) - 1}")
     print(f"Equation: {equation}")
     print_roots(coeffs, roots_mp)
-
-    # Complex-plane plot with built-in button
     plot_roots(roots_mp, equation, coeffs)
 
 
