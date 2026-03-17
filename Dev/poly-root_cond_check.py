@@ -167,7 +167,7 @@ def plot_roots(roots_mp, equation):
     plt.show()
 
 
-def solve_and_plot(dps=10):
+def solve_and_plot(dps=16):
 
     mp.dps = dps
 
@@ -188,7 +188,7 @@ def solve_and_plot(dps=10):
             print(f"\nCompanion matrix condition number: ∞")
             print(
                 "   → Matrix is singular (e.g. root(s) exactly at 0 or multiple roots).")
-            print("   → Roots computed successfully, but they are extremely sensitive.")
+            print("Matrix inversion failed → extremely ill-conditioned (not necessarily singular)")
         elif cond > mpf('1e12'):
             print(f"\nCompanion matrix condition number: {mp.nstr(cond, 6)}")
             print("   → Polynomial is ill-conditioned. Roots may be very sensitive.")
