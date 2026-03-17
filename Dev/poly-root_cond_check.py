@@ -220,7 +220,7 @@ def plot_roots(roots_mp, equation, coeffs):
     plt.figure(figsize=(8, 8))
     plt.axhline(0, lw=1)
     plt.axvline(0, lw=1)
-    plt.scatter(roots_np.real, roots_np.imag, s=10, label="Roots", zorder=5)
+    plt.scatter(roots_np.real, roots_np.imag, color="red",s=30, label="Roots", zorder=5)
 
     t = np.linspace(0, 2 * np.pi, 200)
     plt.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5, label="Unit Circle")
@@ -257,7 +257,7 @@ def plot_polynomial_curve(coeffs, roots_mp, equation):
     y_limit = max(np.sort(np.abs(y_vals))[int(0.95 * len(y_vals))], 1e-9)
 
     plt.figure(figsize=(10, 6))
-    plt.plot(x_vals, y_vals, lw=2, label="p(x)")
+    plt.plot(x_vals, y_vals, lw=2, color="blue", label="p(x)")
     plt.axhline(0, lw=1)
 
     tol = 1e-7
@@ -266,7 +266,7 @@ def plot_polynomial_curve(coeffs, roots_mp, equation):
     ]
 
     if real_roots:
-        plt.plot(real_roots, [0] * len(real_roots), "o", label="Real Roots")
+        plt.plot(real_roots, [0] * len(real_roots), color="red", marker="o", label="Real Roots")
 
     plt.grid(True, linestyle=":", alpha=0.7)
     plt.title(f"Polynomial Curve p(x)\n{equation}")
