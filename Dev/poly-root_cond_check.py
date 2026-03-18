@@ -257,7 +257,10 @@ def plot_polynomial_curve(coeffs, roots_mp, equation):
 
     y_limit = max(np.sort(np.abs(y_vals))[int(0.95 * len(y_vals))], 1e-9)
 
-    plt.figure(figsize=(10, 6))
+    # ✅ reuse window instead of creating new one
+    fig = plt.figure("Polynomial Curve", figsize=(10, 6))
+    fig.clf()
+
     plt.plot(x_vals, y_vals, lw=2, label="p(x)")
     plt.axhline(0, lw=1)
 
@@ -275,6 +278,7 @@ def plot_polynomial_curve(coeffs, roots_mp, equation):
     plt.ylim(-y_limit, y_limit)
     plt.legend(loc='best')
     plt.tight_layout()
+
     plt.show(block=False)
 
 
