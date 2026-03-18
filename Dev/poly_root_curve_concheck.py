@@ -218,19 +218,18 @@ def plot_combined(coeffs, roots_mp, equation):
     ax1.axhline(0, lw=1)
     ax1.axvline(0, lw=1)
 
-    ax1.scatter(roots_np.real, roots_np.imag, color="red", s=10, zorder=5, label="Roots")
+    ax1.scatter(roots_np.real, roots_np.imag, color="red",
+                s=10, zorder=5, label="Roots")
 
     t = np.linspace(0, 2*np.pi, 200)
-    ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5, color="gray", label="Unit Circle")
+    ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5,
+             color="gray", label="Unit Circle")
 
     ax1.set_title("Complex Plane")
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
     ax1.legend(loc="best")
     ax1.grid(True, linestyle=":", alpha=0.6)
-
-    # ax1.set_aspect("equal", adjustable="box")
-    # ax1.set_aspect("auto")
 
     max_real = np.max(np.abs(roots_np.real))
     max_imag = np.max(np.abs(roots_np.imag))
