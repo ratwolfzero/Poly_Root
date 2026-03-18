@@ -235,7 +235,7 @@ def plot_combined(coeffs, roots_mp, equation):
     max_imag = np.max(np.abs(roots_np.imag))
     max_range = max(max_real, max_imag, 1e-6)  # avoid zero collapse
 
-    pad = 1.2 * max_range
+    pad = 1.1 * max_range
 
     ax1.set_xlim(-pad, pad)
     ax1.set_ylim(-pad, pad)
