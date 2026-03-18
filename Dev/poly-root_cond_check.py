@@ -271,7 +271,7 @@ def plot_polynomial_curve(coeffs, roots_mp, equation):
 
     if real_roots:
         plt.plot(real_roots, [0] * len(real_roots),
-                 color="red", marker="o", label="Real Roots")
+                 linestyle='None',color="red", marker="o", label="Real Roots")
 
     plt.grid(True, linestyle=":", alpha=0.7)
     plt.title(f"Polynomial Curve p(x)\n{equation}")
