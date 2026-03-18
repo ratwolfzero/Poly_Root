@@ -216,14 +216,14 @@ def plot_combined(coeffs, roots_mp, equation):
 
     ax1.scatter(roots_np.real, roots_np.imag, color="red", s=40, zorder=5)
 
-    #t = np.linspace(0, 2*np.pi, 200)                               
-    #ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5)
+    t = np.linspace(0, 2*np.pi, 200)                               
+    ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5)
 
     ax1.set_title("Complex Plane")
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
     ax1.grid(True, linestyle=":", alpha=0.6)                                                         
-    #ax1.set_aspect("equal", adjustable="box")
+    ax1.set_aspect("equal", adjustable="box")
     
 
     # ---- Polynomial Curve ----
@@ -261,7 +261,7 @@ def plot_combined(coeffs, roots_mp, equation):
 
 
 # ----------------------------- Main ----------------------------- #                                 
-def solve_and_plot(dps=1000):
+def solve_and_plot(dps=100):
     mp.dps = dps
     print("\n--- Robust Companion Matrix Polynomial Solver ---")
 
