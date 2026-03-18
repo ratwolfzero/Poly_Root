@@ -220,8 +220,8 @@ def plot_combined(coeffs, roots_mp, equation):
 
     ax1.scatter(roots_np.real, roots_np.imag, color="red", s=10, zorder=5)
 
-    # t = np.linspace(0, 2*np.pi, 200)
-    # ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5)
+    t = np.linspace(0, 2*np.pi, 200)
+    ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5)
 
     ax1.set_title("Complex Plane")
     ax1.set_xlabel("Real")
