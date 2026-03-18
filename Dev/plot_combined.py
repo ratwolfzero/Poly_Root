@@ -227,9 +227,9 @@ def plot_combined(coeffs, roots_mp, equation):
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
     ax1.grid(True, linestyle=":", alpha=0.6)
-    #ax1.set_yscale("symlog")
-    #ax1.set_aspect("equal", adjustable="box")
-    #ax1.set_aspect("auto")
+    # ax1.set_yscale("symlog")
+    # ax1.set_aspect("equal", adjustable="box")
+    # ax1.set_aspect("auto")
 
     max_real = np.max(np.abs(roots_np.real))
     max_imag = np.max(np.abs(roots_np.imag))
