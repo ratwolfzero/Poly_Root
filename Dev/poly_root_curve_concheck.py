@@ -208,7 +208,7 @@ def plot_combined(coeffs, roots_mp, equation):
     coeffs_float = np.array([float(c) for c in coeffs])
 
     fig, (ax1, ax2) = plt.subplots(
-        1, 2, figsize=(24, 8),
+        1, 2, figsize=(24, 7),
         gridspec_kw={'width_ratios': [1, 1.5]}
     )
 
@@ -273,7 +273,7 @@ def plot_combined(coeffs, roots_mp, equation):
     ax2.set_ylim(-y_limit, y_limit)
     ax2.grid(True, linestyle=":", alpha=0.7)
 
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.show()
 
 
