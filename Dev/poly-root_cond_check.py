@@ -257,25 +257,39 @@ def plot_polynomial_curve(coeffs, roots_mp, equation):
 
     y_limit = max(np.sort(np.abs(y_vals))[int(0.95 * len(y_vals))], 1e-9)
 
-    # ✅ reuse window instead of creating new one
+    # Reuse window
     fig = plt.figure("Polynomial Curve", figsize=(10, 6))
     fig.clf()
 
+    # Plot the polynomial curve
     plt.plot(x_vals, y_vals, lw=2, label="p(x)")
-    plt.axhline(0, lw=1)
 
+    # Axes
+    plt.axhline(0, lw=1)
+    plt.axvline(0, lw=1)
+
+    # Plot real roots as discrete points
     tol = 1e-7
     real_roots = [
         float(mp.re(r)) for r in roots_mp if abs(float(mp.im(r))) < tol
     ]
 
     if real_roots:
-        plt.plot(real_roots, [0] * len(real_roots),
-                 linestyle='None',color="red", marker="o", label="Real Roots")
+        plt.scatter(
+            real_roots,
+            [0] * len(real_roots),
+            color="red",
+            s=60,
+            label="Real Roots",
+            zorder=5
+        )
 
+    # Styling
     plt.grid(True, linestyle=":", alpha=0.7)
     plt.title(f"Polynomial Curve p(x)\n{equation}")
     plt.ylim(-y_limit, y_limit)
+    plt.xlabel("x")
+    plt.ylabel("p(x)")
     plt.legend(loc='best')
     plt.tight_layout()
 
