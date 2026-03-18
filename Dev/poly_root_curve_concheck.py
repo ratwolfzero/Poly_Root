@@ -218,14 +218,15 @@ def plot_combined(coeffs, roots_mp, equation):
     ax1.axhline(0, lw=1)
     ax1.axvline(0, lw=1)
 
-    ax1.scatter(roots_np.real, roots_np.imag, color="red", s=10, zorder=5)
+    ax1.scatter(roots_np.real, roots_np.imag, color="red", s=10, zorder=5, label="Roots")
 
     t = np.linspace(0, 2*np.pi, 200)
-    ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5)
+    ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5, color="gray", label="Unit Circle")
 
     ax1.set_title("Complex Plane")
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
+    ax1.legend(loc="best")
     ax1.grid(True, linestyle=":", alpha=0.6)
 
     # ax1.set_aspect("equal", adjustable="box")
@@ -253,7 +254,7 @@ def plot_combined(coeffs, roots_mp, equation):
 
     y_limit = max(np.sort(np.abs(y_vals))[int(0.95 * len(y_vals))], 1e-9)
 
-    ax2.plot(x_vals, y_vals, lw=1)
+    ax2.plot(x_vals, y_vals, lw=1, label="p(x)")
     ax2.axhline(0, lw=1)
     ax2.axvline(0, lw=1)
 
@@ -264,11 +265,12 @@ def plot_combined(coeffs, roots_mp, equation):
 
     if real_roots:
         ax2.scatter(real_roots, [0]*len(real_roots),
-                    color="red", s=10, zorder=5)
+                    color="blue", s=10, zorder=5, label="Real Roots")
 
     ax2.set_title(f"Polynomial Curve\n")
     ax2.set_xlabel("x")
     ax2.set_ylabel("p(x)")
+    ax2.legend(loc="best")
     ax2.set_ylim(-y_limit, y_limit)
     ax2.grid(True, linestyle=":", alpha=0.7)
 
