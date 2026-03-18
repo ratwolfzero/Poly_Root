@@ -39,9 +39,11 @@ def coefficient_diagnostics(coeffs):
     ratio = max(mags) / min(mags)
 
     if ratio > 1e12:
-        print(f"WARNING: Extreme coefficient scaling (ratio ≈ {mp.nstr(ratio, 4)})")
+        print(
+            f"WARNING: Extreme coefficient scaling (ratio ≈ {mp.nstr(ratio, 4)})")
     elif ratio > 1e6:
-        print(f"NOTICE: Large coefficient scaling (ratio ≈ {mp.nstr(ratio, 4)})")
+        print(
+            f"NOTICE: Large coefficient scaling (ratio ≈ {mp.nstr(ratio, 4)})")
 
 
 def companion_diagnostics(C):
@@ -53,9 +55,11 @@ def companion_diagnostics(C):
     if cond_number == mp.inf:
         print("WARNING: Companion matrix is singular or near-singular.")
     elif cond_number > 1e12:
-        print(f"WARNING: Ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
+        print(
+            f"WARNING: Ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
     elif cond_number > 1e6:
-        print(f"NOTICE: Moderately ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
+        print(
+            f"NOTICE: Moderately ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
 
     return cond_number
 
@@ -207,7 +211,7 @@ def plot_combined(coeffs, roots_mp, equation):
         1, 2, figsize=(12, 5),
         gridspec_kw={'width_ratios': [1, 1.5]}
     )
-    
+
     fig.canvas.manager.set_window_title(f"Polynomial: {equation}")
 
     # ---- Complex Plane ----
@@ -216,15 +220,15 @@ def plot_combined(coeffs, roots_mp, equation):
 
     ax1.scatter(roots_np.real, roots_np.imag, color="red", s=40, zorder=5)
 
-    t = np.linspace(0, 2*np.pi, 200)                               
-    ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5)
+    # t = np.linspace(0, 2*np.pi, 200)
+    # ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5)
 
     ax1.set_title("Complex Plane")
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
-    ax1.grid(True, linestyle=":", alpha=0.6)                                                         
-    ax1.set_aspect("equal", adjustable="box")
-    
+    ax1.grid(True, linestyle=":", alpha=0.6)
+    # ax1.set_aspect("equal", adjustable="box")
+    ax1.set_aspect("auto")
 
     # ---- Polynomial Curve ----
     real_parts = [float(mp.re(r)) for r in roots_mp]
@@ -236,7 +240,7 @@ def plot_combined(coeffs, roots_mp, equation):
     x_vals = np.linspace(x_center - x_pad, x_center + x_pad, 2000)
     y_vals = np.polyval(coeffs_float, x_vals)
 
-    y_limit = max(np.sort(np.abs(y_vals))[int(0.95 * len(y_vals))], 1e-9)                            
+    y_limit = max(np.sort(np.abs(y_vals))[int(0.95 * len(y_vals))], 1e-9)
 
     ax2.plot(x_vals, y_vals, lw=2)
     ax2.axhline(0, lw=1)
@@ -248,19 +252,20 @@ def plot_combined(coeffs, roots_mp, equation):
     ]
 
     if real_roots:
-        ax2.scatter(real_roots, [0]*len(real_roots), color="red", s=60, zorder=5)
+        ax2.scatter(real_roots, [0]*len(real_roots),
+                    color="red", s=60, zorder=5)
 
     ax2.set_title(f"Polynomial Curve\n")
-    ax2.set_xlabel("x")                                                                              
+    ax2.set_xlabel("x")
     ax2.set_ylabel("p(x)")
     ax2.set_ylim(-y_limit, y_limit)
     ax2.grid(True, linestyle=":", alpha=0.7)
-																									 
+
     plt.tight_layout()
     plt.show()
 
 
-# ----------------------------- Main ----------------------------- #                                 
+# ----------------------------- Main ----------------------------- #
 def solve_and_plot(dps=100):
     mp.dps = dps
     print("\n--- Robust Companion Matrix Polynomial Solver ---")
