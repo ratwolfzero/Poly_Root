@@ -218,7 +218,7 @@ def plot_combined(coeffs, roots_mp, equation):
     ax1.axhline(0, lw=1)
     ax1.axvline(0, lw=1)
 
-    ax1.scatter(roots_np.real, roots_np.imag, color="red", s=40, zorder=5)
+    ax1.scatter(roots_np.real, roots_np.imag, color="red", s=10, zorder=5)
 
     # t = np.linspace(0, 2*np.pi, 200)
     # ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5)
@@ -227,8 +227,19 @@ def plot_combined(coeffs, roots_mp, equation):
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
     ax1.grid(True, linestyle=":", alpha=0.6)
-    # ax1.set_aspect("equal", adjustable="box")
-    ax1.set_aspect("auto")
+    #ax1.set_yscale("symlog")
+    #ax1.set_aspect("equal", adjustable="box")
+    #ax1.set_aspect("auto")
+
+    max_real = np.max(np.abs(roots_np.real))
+    max_imag = np.max(np.abs(roots_np.imag))
+    max_range = max(max_real, max_imag, 1e-6)  # avoid zero collapse
+
+    pad = 1.2 * max_range
+
+    ax1.set_xlim(-pad, pad)
+    ax1.set_ylim(-pad, pad)
+    ax1.set_aspect('equal', adjustable='box')
 
     # ---- Polynomial Curve ----
     real_parts = [float(mp.re(r)) for r in roots_mp]
@@ -242,7 +253,7 @@ def plot_combined(coeffs, roots_mp, equation):
 
     y_limit = max(np.sort(np.abs(y_vals))[int(0.95 * len(y_vals))], 1e-9)
 
-    ax2.plot(x_vals, y_vals, lw=2)
+    ax2.plot(x_vals, y_vals, lw=1)
     ax2.axhline(0, lw=1)
     ax2.axvline(0, lw=1)
 
@@ -253,7 +264,7 @@ def plot_combined(coeffs, roots_mp, equation):
 
     if real_roots:
         ax2.scatter(real_roots, [0]*len(real_roots),
-                    color="red", s=60, zorder=5)
+                    color="red", s=10, zorder=5)
 
     ax2.set_title(f"Polynomial Curve\n")
     ax2.set_xlabel("x")
