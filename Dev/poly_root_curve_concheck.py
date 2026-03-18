@@ -208,7 +208,7 @@ def plot_combined(coeffs, roots_mp, equation):
     coeffs_float = np.array([float(c) for c in coeffs])
 
     fig, (ax1, ax2) = plt.subplots(
-        1, 2, figsize=(12, 5),
+        1, 2, figsize=(24, 8),
         gridspec_kw={'width_ratios': [1, 1.5]}
     )
 
