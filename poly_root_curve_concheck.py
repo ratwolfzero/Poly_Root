@@ -282,7 +282,7 @@ def plot_combined(coeffs, roots_mp, equation):
     ax2.set_ylim(-y_limit, y_limit)
     ax2.grid(True, linestyle=":", alpha=0.7)
 
-    #plt.tight_layout()
+    # plt.tight_layout()
     plt.show()
 
 
