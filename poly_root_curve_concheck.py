@@ -116,7 +116,7 @@ def polynomial_string(coeffs):
 
 
 def poly_eval(coeffs, x):
-    p = mpf(0)
+    p = mpc(0)
     for c in coeffs:
         p = p * x + c
     return p
