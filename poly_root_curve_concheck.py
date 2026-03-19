@@ -98,11 +98,20 @@ def polynomial_string(coeffs):
         if c == 0:
             continue
         deg = n - i
-        sign = "" if not terms and c > 0 else (" + " if c > 0 else " - ")
         abs_c = abs(c)
         coeff_str = "" if deg > 0 and abs_c == 1 else fmt(abs_c)
         var_str = f"x^{deg}" if deg > 1 else ("x" if deg == 1 else "")
-        terms.append(f"{sign}{coeff_str}{var_str}")
+        term_str = f"{coeff_str}{var_str}"
+
+        if not terms:  # first term
+            sign = "-" if c < 0 else ""
+            terms.append(f"{sign}{term_str}")
+        else:
+            sign = " + " if c > 0 else " - "
+            terms.append(f"{sign}{term_str}")
+
+    if not terms:
+        return "0 = 0"
     return "".join(terms) + " = 0"
 
 
@@ -266,7 +275,7 @@ def plot_combined(coeffs, roots_mp, equation):
         ax2.scatter(real_roots, [0]*len(real_roots),
                     color="blue", s=10, zorder=5, label="Real Roots")
 
-    ax2.set_title(f"Polynomial Curve\n")
+    ax2.set_title(f"Polynomial Curve")
     ax2.set_xlabel("x")
     ax2.set_ylabel("p(x)")
     ax2.legend(loc="best")
