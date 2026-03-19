@@ -208,60 +208,48 @@ def print_roots(coeffs, roots_mp):
 def plot_combined(coeffs, roots_mp, equation):
     if not roots_mp:
         return
-
     roots_np = np.array([
         complex(float(mp.re(z)), float(mp.im(z)))
         for z in roots_mp
     ])
-
-    coeffs_float = np.array([float(c) for c in coeffs])
-
     fig, (ax1, ax2) = plt.subplots(
         1, 2, figsize=(24, 7),
         gridspec_kw={'width_ratios': [1, 1.5]}
     )
-
     fig.canvas.manager.set_window_title(f"Polynomial: {equation}")
 
-    # ---- Complex Plane ----
+    # ---- Complex Plane ---- (unchanged)
     ax1.axhline(0, lw=1)
     ax1.axvline(0, lw=1)
-
     ax1.scatter(roots_np.real, roots_np.imag, color="red",
                 s=10, zorder=5, label="Roots")
-
     t = np.linspace(0, 2*np.pi, 200)
     ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5,
              color="gray", label="Unit Circle")
-
     ax1.set_title("Complex Plane")
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
     ax1.legend(loc="best")
     ax1.grid(True, linestyle=":", alpha=0.6)
-
     max_real = np.max(np.abs(roots_np.real))
     max_imag = np.max(np.abs(roots_np.imag))
-    max_range = max(max_real, max_imag, 1e-6)  # avoid zero collapse
-
+    max_range = max(max_real, max_imag, 1e-6)
     pad = 1.1 * max_range
-
     ax1.set_xlim(-pad, pad)
     ax1.set_ylim(-pad, pad)
     ax1.set_aspect('equal', adjustable='box')
 
-    # ---- Polynomial Curve ----
+    # ---- Polynomial Curve ---
     real_parts = [float(mp.re(r)) for r in roots_mp]
-
     spread = max(real_parts) - min(real_parts)
     x_center = sum(real_parts) / len(real_parts)
     x_pad = 1.5 * max(spread, 1.0)
-
     x_vals = np.linspace(x_center - x_pad, x_center + x_pad, 2000)
-    y_vals = np.polyval(coeffs_float, x_vals)
+
+    # ←←← THE FIX IS HERE
+    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx)))) for xx in x_vals])
 
     y_limit = max(np.sort(np.abs(y_vals))[int(0.95 * len(y_vals))], 1e-9)
-
     ax2.plot(x_vals, y_vals, lw=1, label="p(x)")
     ax2.axhline(0, lw=1)
     ax2.axvline(0, lw=1)
@@ -270,7 +258,6 @@ def plot_combined(coeffs, roots_mp, equation):
     real_roots = [
         float(mp.re(r)) for r in roots_mp if abs(float(mp.im(r))) < tol
     ]
-
     if real_roots:
         ax2.scatter(real_roots, [0]*len(real_roots),
                     color="blue", s=10, zorder=5, label="Real Roots")
@@ -282,7 +269,6 @@ def plot_combined(coeffs, roots_mp, equation):
     ax2.set_ylim(-y_limit, y_limit)
     ax2.grid(True, linestyle=":", alpha=0.7)
 
-    # plt.tight_layout()
     plt.show()
 
 
