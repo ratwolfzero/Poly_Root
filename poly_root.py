@@ -268,7 +268,7 @@ def plot_combined(coeffs, roots_mp, equation):
     ax2.set_ylabel("p(x)")
     ax2.legend(loc="best")
 
-    # ←←← THE FIX (replaces your 95% scaling)
+    
     if max_abs > 1e6:                                 # Wilkinson triggers this
         ax2.set_yscale('symlog', linthresh=1e5)       # linear near zero, log outside
         print("NOTICE: symlog y-scale activated (shows naked dynamic range)")
