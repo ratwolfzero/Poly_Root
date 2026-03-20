@@ -231,7 +231,7 @@ def plot_combined(coeffs, roots_mp, equation):
     )
     fig.canvas.manager.set_window_title(f"Polynomial: {equation}")
 
-    # ---- Complex Plane ---- 
+    # ---- Complex Plane ----
     ax1.axhline(0, lw=1)
     ax1.axvline(0, lw=1)
     ax1.scatter(roots_np.real, roots_np.imag, color="red",
@@ -259,11 +259,13 @@ def plot_combined(coeffs, roots_mp, equation):
     x_pad = 1.5 * max(spread, 1.0)
     x_vals = np.linspace(x_center - x_pad, x_center + x_pad, 2000)
 
-    
-    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx)))) for xx in x_vals])
+    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx))))
+                      for xx in x_vals])
 
-    y_limit = max(np.sort(np.abs(y_vals))[int(0.95 * len(y_vals))], 1e-9)
-    ax2.plot(x_vals, y_vals, lw=1, label="p(x)")
+    max_abs = np.max(np.abs(y_vals)) if len(y_vals) > 0 else 1.0
+
+    ax2.plot(x_vals, y_vals, lw=1, label=f"p(x)")
+
     ax2.axhline(0, lw=1)
     ax2.axvline(0, lw=1)
 
@@ -275,11 +277,18 @@ def plot_combined(coeffs, roots_mp, equation):
         ax2.scatter(real_roots, [0]*len(real_roots),
                     color="blue", s=10, zorder=5, label="Real Roots")
 
-    ax2.set_title(f"Polynomial Curve")
+    ax2.set_title("Polynomial Curve")
     ax2.set_xlabel("x")
-    ax2.set_ylabel("p(x)")
+    ax2.set_ylabel("$f(x)$")
     ax2.legend(loc="best")
-    ax2.set_ylim(-y_limit, y_limit)
+
+    if max_abs > 1e6:
+        ax2.set_yscale('symlog', linthresh=1e5)
+        print("NOTICE: symlog y-scale activated (shows naked dynamic range)")
+    else:
+        # — just a tiny padding around the true max
+        ax2.set_ylim(-max_abs * 1.05, max_abs * 1.05)
+
     ax2.grid(True, linestyle=":", alpha=0.7)
 
     plt.show()
