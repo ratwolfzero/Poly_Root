@@ -218,7 +218,7 @@ def plot_combined(coeffs, roots_mp, equation):
     )
     fig.canvas.manager.set_window_title(f"Polynomial: {equation}")
 
-    # ---- Complex Plane ---- (unchanged)
+    # ---- Complex Plane ---- 
     ax1.axhline(0, lw=1)
     ax1.axvline(0, lw=1)
     ax1.scatter(roots_np.real, roots_np.imag, color="red",
@@ -272,7 +272,7 @@ def plot_combined(coeffs, roots_mp, equation):
         ax2.set_yscale('symlog', linthresh=1e5)
         print("NOTICE: symlog y-scale activated (shows naked dynamic range)")
     else:
-        # No more 95% magic — just a tiny padding around the true max
+        # — just a tiny padding around the true max
         ax2.set_ylim(-max_abs * 1.05, max_abs * 1.05)
 
     ax2.grid(True, linestyle=":", alpha=0.7)
