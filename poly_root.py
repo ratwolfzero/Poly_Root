@@ -240,14 +240,15 @@ def plot_combined(coeffs, roots_mp, equation):
     ax1.set_aspect('equal', adjustable='box')
 
     # ---- Polynomial Curve ---
-        # ---- Polynomial Curve ----
+    # ---- Polynomial Curve ----
     real_parts = [float(mp.re(r)) for r in roots_mp]
     spread = max(real_parts) - min(real_parts)
     x_center = sum(real_parts) / len(real_parts)
     x_pad = 1.5 * max(spread, 1.0)
     x_vals = np.linspace(x_center - x_pad, x_center + x_pad, 2000)
 
-    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx)))) for xx in x_vals])
+    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx))))
+                      for xx in x_vals])
 
     max_abs = np.max(np.abs(y_vals)) if len(y_vals) > 0 else 1.0
 
@@ -268,13 +269,12 @@ def plot_combined(coeffs, roots_mp, equation):
     ax2.set_ylabel("p(x)")
     ax2.legend(loc="best")
 
-    
-    if max_abs > 1e6:                                 # Wilkinson triggers this
-        ax2.set_yscale('symlog', linthresh=1e5)       # linear near zero, log outside
+    if max_abs > 1e6:
+        ax2.set_yscale('symlog', linthresh=1e5)
         print("NOTICE: symlog y-scale activated (shows naked dynamic range)")
     else:
-        y_limit = max(np.sort(np.abs(y_vals))[int(0.95 * len(y_vals))], 1e-9)
-        ax2.set_ylim(-y_limit, y_limit)
+        # No more 95% magic — just a tiny padding around the true max
+        ax2.set_ylim(-max_abs * 1.05, max_abs * 1.05)
 
     ax2.grid(True, linestyle=":", alpha=0.7)
 
