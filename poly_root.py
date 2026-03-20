@@ -298,7 +298,7 @@ def plot_combined(coeffs, roots_mp, equation):
 
 
 # ----------------------------- Main ----------------------------- #
-def solve_and_plot(dps=16):
+def solve_and_plot(dps=100):
     mp.dps = dps
     print("\n--- Robust Companion Matrix Polynomial Solver ---")
 
