@@ -221,37 +221,38 @@ def print_roots(coeffs, roots_mp):
 def plot_combined(coeffs, roots_mp, equation):
     if not roots_mp:
         return
-    
+
     roots_np = np.array([
         complex(float(mp.re(z)), float(mp.im(z)))
         for z in roots_mp
     ])
-    
+
     # Increase the top margin slightly to make room for the Suptitle
     fig, (ax1, ax2) = plt.subplots(
-        1, 2, figsize=(16, 8), 
+        1, 2, figsize=(16, 8),
         gridspec_kw={'width_ratios': [1, 1.5]}
     )
-    
-    # --- The Addition: Global Title (Equation) ---
-    # We use wrap=True so long equations don't exit the screen
-    fig.suptitle(f"Polynomial Equation: {equation}", fontsize=14, fontweight='bold', wrap=True)
+
+    fig.suptitle(f"Polynomial Equation: {equation}",
+                 fontsize=10, fontweight='bold', wrap=True)
     fig.canvas.manager.set_window_title(f"Solver Output")
 
     # ---- Complex Plane ----
     ax1.axhline(0, color='black', lw=1, alpha=0.5)
     ax1.axvline(0, color='black', lw=1, alpha=0.5)
-    ax1.scatter(roots_np.real, roots_np.imag, color="red", s=30, zorder=5, label="Roots")
-    
+    ax1.scatter(roots_np.real, roots_np.imag, color="red",
+                s=30, zorder=5, label="Roots")
+
     t = np.linspace(0, 2*np.pi, 200)
-    ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5, color="gray", label="Unit Circle")
-    
+    ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5,
+             color="gray", label="Unit Circle")
+
     ax1.set_title("Roots in Complex Plane")
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
     ax1.legend(loc="upper right")
     ax1.grid(True, linestyle=":", alpha=0.6)
-    
+
     # Square scaling for the complex plane
     limit = max(np.max(np.abs(roots_np.real)) if len(roots_np) > 0 else 1,
                 np.max(np.abs(roots_np.imag)) if len(roots_np) > 0 else 1, 1.1)
@@ -264,17 +265,18 @@ def plot_combined(coeffs, roots_mp, equation):
     x_min, x_max = min(real_parts), max(real_parts)
     margin = max((x_max - x_min) * 0.5, 2.0)
     x_vals = np.linspace(x_min - margin, x_max + margin, 1000)
-    
+
     y_vals = [float(mp.re(poly_eval(coeffs, mpf(x)))) for x in x_vals]
-    
+
     ax2.plot(x_vals, y_vals, color='tab:blue', lw=2, label="p(x) [Real]")
     ax2.axhline(0, color='black', lw=1)
-    
+
     # Highlight real roots on the curve
     tol = 1e-9
     real_roots = [r.real for r in roots_np if abs(r.imag) < tol]
     if real_roots:
-        ax2.scatter(real_roots, [0]*len(real_roots), color="blue", s=40, zorder=5, label="Real Roots")
+        ax2.scatter(real_roots, [0]*len(real_roots),
+                    color="blue", s=40, zorder=5, label="Real Roots")
 
     ax2.set_title("Polynomial Curve (Real Domain)")
     ax2.set_xlabel("x")
@@ -283,13 +285,15 @@ def plot_combined(coeffs, roots_mp, equation):
     ax2.legend()
 
     # Dynamic Y-scaling to keep the curve visible
-    y_limit = np.percentile(np.abs(y_vals), 95) # Ignore extreme outliers for scaling
+    # Ignore extreme outliers for scaling
+    y_limit = np.percentile(np.abs(y_vals), 95)
     if y_limit > 1e6:
         ax2.set_yscale('symlog', linthresh=100)
     else:
         ax2.set_ylim(-y_limit*2, y_limit*2)
 
-    plt.tight_layout(rect=[0, 0.03, 1, 0.95]) # Adjust layout to make room for suptitle
+    # Adjust layout to make room for suptitle
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.show()
 
 
