@@ -209,10 +209,10 @@ def print_roots(coeffs, roots_mp):
         # :+15.6f  -> Right-aligned, 15 chars wide, 6 decimals, ALWAYS shows +/-
         print(
             f"{i:<6d} "
-            f"{r_real:14.6f} "
-            f"{r_imag:+15.6f}j " # The '+' forces the sign and keeps it in the column
-            f"{mag:10.4f} "
-            f"{mp.nstr(residual, 6):>14}"
+            f"{r_real:14.9f} "
+            f"{r_imag:+15.9f}j " # The '+' forces the sign and keeps it in the column
+            f"{mag:10.6f} "
+            f"{mp.nstr(residual, 9):>14}"
         )
 
 
