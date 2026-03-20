@@ -221,78 +221,67 @@ def print_roots(coeffs, roots_mp):
 def plot_combined(coeffs, roots_mp, equation):
     if not roots_mp:
         return
-
     roots_np = np.array([
         complex(float(mp.re(z)), float(mp.im(z)))
         for z in roots_mp
     ])
-
     fig, (ax1, ax2) = plt.subplots(
-        1, 2, figsize=(16, 7),
+        1, 2, figsize=(24, 7),
         gridspec_kw={'width_ratios': [1, 1.5]}
     )
+    fig.canvas.manager.set_window_title(f"Polynomial: {equation}")
 
-    fig.suptitle(f"Polynomial Equation: {equation}",
-                 fontsize=10, fontweight='bold', wrap=True)
-    fig.canvas.manager.set_window_title(f"Solver Output")
-
-    # ---- Complex Plane ----
-    ax1.axhline(0, color='black', lw=1, alpha=0.5)
-    ax1.axvline(0, color='black', lw=1, alpha=0.5)
+    # ---- Complex Plane ---- 
+    ax1.axhline(0, lw=1)
+    ax1.axvline(0, lw=1)
     ax1.scatter(roots_np.real, roots_np.imag, color="red",
                 s=10, zorder=5, label="Roots")
-
     t = np.linspace(0, 2*np.pi, 200)
     ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5,
              color="gray", label="Unit Circle")
-
-    ax1.set_title("Roots in Complex Plane")
+    ax1.set_title("Complex Plane")
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
-    ax1.legend(loc="upper right")
+    ax1.legend(loc="best")
     ax1.grid(True, linestyle=":", alpha=0.6)
+    max_real = np.max(np.abs(roots_np.real))
+    max_imag = np.max(np.abs(roots_np.imag))
+    max_range = max(max_real, max_imag, 1e-6)
+    pad = 1.1 * max_range
+    ax1.set_xlim(-pad, pad)
+    ax1.set_ylim(-pad, pad)
+    ax1.set_aspect('equal', adjustable='box')
 
-    # Square scaling for the complex plane
-    limit = max(np.max(np.abs(roots_np.real)) if len(roots_np) > 0 else 1,
-                np.max(np.abs(roots_np.imag)) if len(roots_np) > 0 else 1, 1.1)
-    ax1.set_xlim(-limit*1.1, limit*1.1)
-    ax1.set_ylim(-limit*1.1, limit*1.1)
-    ax1.set_aspect('equal')
-
-    # ---- Polynomial Curve ----
+    # ---- Polynomial Curve ---- 
     real_parts = [float(mp.re(r)) for r in roots_mp]
-    x_min, x_max = min(real_parts), max(real_parts)
-    margin = max((x_max - x_min) * 0.5, 2.0)
-    x_vals = np.linspace(x_min - margin, x_max + margin, 1000)
+    spread = max(real_parts) - min(real_parts)
+    x_center = sum(real_parts) / len(real_parts)
+    x_pad = 1.5 * max(spread, 1.0)
+    x_vals = np.linspace(x_center - x_pad, x_center + x_pad, 2000)
 
-    y_vals = [float(mp.re(poly_eval(coeffs, mpf(x)))) for x in x_vals]
+    
+    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx)))) for xx in x_vals])
 
-    ax2.plot(x_vals, y_vals, color='tab:blue', lw=1, label="p(x) [Real]")
-    ax2.axhline(0, color='black', lw=1)
+    y_limit = max(np.sort(np.abs(y_vals))[int(0.95 * len(y_vals))], 1e-9)
+    ax2.plot(x_vals, y_vals, lw=1, label="p(x)")
+    ax2.axhline(0, lw=1)
+    ax2.axvline(0, lw=1)
 
-    # Highlight real roots on the curve
-    tol = 1e-9
-    real_roots = [r.real for r in roots_np if abs(r.imag) < tol]
+    tol = 1e-7
+    real_roots = [
+        float(mp.re(r)) for r in roots_mp if abs(float(mp.im(r))) < tol
+    ]
     if real_roots:
         ax2.scatter(real_roots, [0]*len(real_roots),
                     color="blue", s=10, zorder=5, label="Real Roots")
 
-    ax2.set_title("Polynomial Curve (Real Domain)")
+    ax2.set_title(f"Polynomial Curve")
     ax2.set_xlabel("x")
     ax2.set_ylabel("p(x)")
-    ax2.grid(True, linestyle=":", alpha=0.6)
-    ax2.legend()
+    ax2.legend(loc="best")
+    ax2.set_ylim(-y_limit, y_limit)
+    ax2.grid(True, linestyle=":", alpha=0.7)
 
-    # Dynamic Y-scaling to keep the curve visible
-    # Ignore extreme outliers for scaling
-    y_limit = np.percentile(np.abs(y_vals), 95)
-    if y_limit > 1e6:
-        ax2.set_yscale('symlog', linthresh=100)
-    else:
-        ax2.set_ylim(-y_limit*2, y_limit*2)
-
-    # Adjust layout to make room for suptitle
-    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.show()
 
 
