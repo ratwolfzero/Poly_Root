@@ -197,20 +197,21 @@ def print_roots(coeffs, roots_mp):
     print("-" * 75)
     print(f"{'Root #':<6} {'Real':>14} {'Imaginary':>16} {'|z|':>10} {'Residual':>14}")
     print("-" * 75)
-    
+
     for i, r in enumerate(roots_mp, 1):
         residual = abs(poly_eval(coeffs, r))
         r_real = float(mp.re(r))
         r_imag = float(mp.im(r))
-        mag    = float(abs(r))
-        
+        mag = float(abs(r))
+
         # Format strings:
         # :>14.6f  -> Right-aligned, 14 chars wide, 6 decimal places
         # :+15.6f  -> Right-aligned, 15 chars wide, 6 decimals, ALWAYS shows +/-
         print(
             f"{i:<6d} "
             f"{r_real:14.9f} "
-            f"{r_imag:+15.9f}j " # The '+' forces the sign and keeps it in the column
+            # The '+' forces the sign and keeps it in the column
+            f"{r_imag:+15.9f}j "
             f"{mag:10.6f} "
             f"{mp.nstr(residual, 9):>14}"
         )
