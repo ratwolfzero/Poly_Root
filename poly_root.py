@@ -227,14 +227,13 @@ def plot_combined(coeffs, roots_mp, equation):
         for z in roots_mp
     ])
 
-    # Increase the top margin slightly to make room for the Suptitle
     fig, (ax1, ax2) = plt.subplots(
-        1, 2, figsize=(16, 8),
+        1, 2, figsize=(16, 7),
         gridspec_kw={'width_ratios': [1, 1.5]}
     )
 
     fig.suptitle(f"Polynomial Equation: {equation}",
-                 fontsize=12, fontweight='bold', wrap=True)
+                 fontsize=10, fontweight='bold', wrap=True)
     fig.canvas.manager.set_window_title(f"Solver Output")
 
     # ---- Complex Plane ----
