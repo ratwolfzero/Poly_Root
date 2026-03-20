@@ -229,7 +229,8 @@ def plot_combined(coeffs, roots_mp, equation):
         1, 2, figsize=(24, 7),
         gridspec_kw={'width_ratios': [1, 1.5]}
     )
-    fig.canvas.manager.set_window_title(f"Polynomial: {equation}")
+    fig.canvas.manager.set_window_title(f"Complex Plane and Polynomial Curve")
+    fig.suptitle(f"Polynomial: {equation}", wrap=True)
 
     # ---- Complex Plane ----
     ax1.axhline(0, lw=1)
@@ -290,6 +291,8 @@ def plot_combined(coeffs, roots_mp, equation):
         ax2.set_ylim(-max_abs * 1.05, max_abs * 1.05)
 
     ax2.grid(True, linestyle=":", alpha=0.7)
+
+    plt.subplots_adjust(top=0.85)
 
     plt.show()
 
