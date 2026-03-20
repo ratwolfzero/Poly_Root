@@ -193,22 +193,26 @@ def compute_roots(coeffs):
 
 # ----------------------------- Display ----------------------------- #
 def print_roots(coeffs, roots_mp):
-    print("-" * 70)
-    print(f"{'Root #':<6} {'Real':>12} {'Imag':>13} {'|z|':>10} {'Residual':>12}")
-    print("-" * 70)
+    # Header - Imag column widened slightly to account for the 'j'
+    print("-" * 75)
+    print(f"{'Root #':<6} {'Real':>14} {'Imaginary':>16} {'|z|':>10} {'Residual':>14}")
+    print("-" * 75)
+    
     for i, r in enumerate(roots_mp, 1):
         residual = abs(poly_eval(coeffs, r))
         r_real = float(mp.re(r))
         r_imag = float(mp.im(r))
-        mag = float(abs(r))
-        sign = "+" if r_imag >= 0 else "-"
-
+        mag    = float(abs(r))
+        
+        # Format strings:
+        # :>14.6f  -> Right-aligned, 14 chars wide, 6 decimal places
+        # :+15.6f  -> Right-aligned, 15 chars wide, 6 decimals, ALWAYS shows +/-
         print(
             f"{i:<6d} "
-            f"{r_real:12.6f} "
-            f"{sign}{abs(r_imag):12.6f}j "
+            f"{r_real:14.6f} "
+            f"{r_imag:+15.6f}j " # The '+' forces the sign and keeps it in the column
             f"{mag:10.4f} "
-            f"{mp.nstr(residual, 6):>12}"
+            f"{mp.nstr(residual, 6):>14}"
         )
 
 
