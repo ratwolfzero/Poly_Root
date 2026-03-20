@@ -241,7 +241,7 @@ def plot_combined(coeffs, roots_mp, equation):
     ax1.axhline(0, color='black', lw=1, alpha=0.5)
     ax1.axvline(0, color='black', lw=1, alpha=0.5)
     ax1.scatter(roots_np.real, roots_np.imag, color="red",
-                s=30, zorder=5, label="Roots")
+                s=10, zorder=5, label="Roots")
 
     t = np.linspace(0, 2*np.pi, 200)
     ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5,
@@ -268,7 +268,7 @@ def plot_combined(coeffs, roots_mp, equation):
 
     y_vals = [float(mp.re(poly_eval(coeffs, mpf(x)))) for x in x_vals]
 
-    ax2.plot(x_vals, y_vals, color='tab:blue', lw=2, label="p(x) [Real]")
+    ax2.plot(x_vals, y_vals, color='tab:blue', lw=1, label="p(x) [Real]")
     ax2.axhline(0, color='black', lw=1)
 
     # Highlight real roots on the curve
@@ -276,7 +276,7 @@ def plot_combined(coeffs, roots_mp, equation):
     real_roots = [r.real for r in roots_np if abs(r.imag) < tol]
     if real_roots:
         ax2.scatter(real_roots, [0]*len(real_roots),
-                    color="blue", s=40, zorder=5, label="Real Roots")
+                    color="blue", s=10, zorder=5, label="Real Roots")
 
     ax2.set_title("Polynomial Curve (Real Domain)")
     ax2.set_xlabel("x")
