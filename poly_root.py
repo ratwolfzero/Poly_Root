@@ -193,14 +193,18 @@ def compute_roots(coeffs):
 
 # ----------------------------- Display ----------------------------- #
 def print_roots(coeffs, roots_mp):
-    print("-" * 40)
+    print("-" * 60)
+    print(f"{'Root #':<8} {'Real':<12} {'Imag':<12} {'|z|':<10} {'Residual'}")
+    print("-" * 60)
     for i, r in enumerate(roots_mp, 1):
         residual = abs(poly_eval(coeffs, r))
         r_real, r_imag = float(mp.re(r)), float(mp.im(r))
+        mag = float(abs(r))
+        
+        sign = "+" if r_imag >= 0 else "-"
         print(
-            f"Root {i:2d}: {r_real:10.6f} "
-            f"{'+' if r_imag >= 0 else '-'} {abs(r_imag):.6f}j"
-            f" |p(r)| ≈ {mp.nstr(residual, 6)}"
+            f"{i:<8} {r_real:>10.6f} {sign} {abs(r_imag):.6f}j "
+            f"| {mag:>8.4f} | {mp.nstr(residual, 4)}"
         )
 
 
