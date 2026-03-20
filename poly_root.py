@@ -229,7 +229,7 @@ def plot_combined(coeffs, roots_mp, equation):
         1, 2, figsize=(24, 7),
         gridspec_kw={'width_ratios': [1, 1.5]}
     )
-    fig.canvas.manager.set_window_title(f"Complex Plane and Polynomial Curve")
+    fig.canvas.manager.set_window_title(f"Complex Plane and Polynomial Curve in Real Domain")
     fig.suptitle(f"Polynomial: {equation}", wrap=True)
 
     # ---- Complex Plane ----
@@ -278,7 +278,7 @@ def plot_combined(coeffs, roots_mp, equation):
         ax2.scatter(real_roots, [0]*len(real_roots),
                     color="blue", s=10, zorder=5, label="Real Roots")
 
-    ax2.set_title("Polynomial Curve")
+    ax2.set_title("Polynomial Curve in Real Domain1")
     ax2.set_xlabel("x")
     ax2.set_ylabel("$f(x)$")
     ax2.legend(loc="best")
