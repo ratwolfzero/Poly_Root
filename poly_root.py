@@ -253,7 +253,7 @@ def plot_combined(coeffs, roots_mp, equation):
     ax1.set_ylim(-pad, pad)
     ax1.set_aspect('equal', adjustable='box')
 
-    # ---- Polynomial Curve ---- 
+    # ---- Polynomial Curve ----
     real_parts = [float(mp.re(r)) for r in roots_mp]
     spread = max(real_parts) - min(real_parts)
     x_center = sum(real_parts) / len(real_parts)
