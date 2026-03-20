@@ -234,7 +234,7 @@ def plot_combined(coeffs, roots_mp, equation):
     )
 
     fig.suptitle(f"Polynomial Equation: {equation}",
-                 fontsize=10, fontweight='bold', wrap=True)
+                 fontsize=12, fontweight='bold', wrap=True)
     fig.canvas.manager.set_window_title(f"Solver Output")
 
     # ---- Complex Plane ----
