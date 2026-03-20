@@ -200,9 +200,9 @@ def print_roots(coeffs, roots_mp):
         residual = abs(poly_eval(coeffs, r))
         r_real = float(mp.re(r))
         r_imag = float(mp.im(r))
-        mag    = float(abs(r))
-        sign   = "+" if r_imag >= 0 else "-"
-        
+        mag = float(abs(r))
+        sign = "+" if r_imag >= 0 else "-"
+
         print(
             f"{i:<6d} "
             f"{r_real:12.6f} "
@@ -226,7 +226,7 @@ def plot_combined(coeffs, roots_mp, equation):
     )
     fig.canvas.manager.set_window_title(f"Polynomial: {equation}")
 
-    # ---- Complex Plane ---- 
+    # ---- Complex Plane ----
     ax1.axhline(0, lw=1)
     ax1.axvline(0, lw=1)
     ax1.scatter(roots_np.real, roots_np.imag, color="red",
