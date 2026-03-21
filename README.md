@@ -219,11 +219,13 @@ $(x-1)^{10}$
 
     1 -10 45 -120 210 -252 210 -120 45 -10 1
 
+Remark: Compare default `dps=100`with `dps=400`!
+
 $(x-1)^{20}$
 
     1 -20 190 -1140 4845 -15504 38760 -77520 125970 -167960 184756 -167960 125970 -77520 38760 -15504 4845 -1140 190 -20 1
 
-    Remark: Compare default `dps=100`with `dps=400`!
+Remark: Compare default `dps=100`with `dps=400`!
 
 ### 4. High-multiplicity complex roots: $(x^2 + 1)^5$
 
