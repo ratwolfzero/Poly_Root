@@ -305,7 +305,8 @@ def plot_combined(coeffs, roots_mp, equation):
         ax2.scatter(real_roots, [0]*len(real_roots),
                     color="blue", s=10, zorder=5, label="Real Roots")
 
-    ax2.set_title("Polynomial Curve and Roots in Real Domain")   # Fix 2: typo removed
+    # Fix 2: typo removed
+    ax2.set_title("Polynomial Curve and Roots in Real Domain")
     ax2.set_xlabel("x")
     ax2.set_ylabel("$f(x)$")
     ax2.legend(loc="best")
