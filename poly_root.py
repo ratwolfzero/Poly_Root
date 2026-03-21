@@ -175,7 +175,13 @@ def compute_roots(coeffs):
     if detect_clusters(roots_mp):
         print("NOTICE: Clustered roots detected → high sensitivity likely.")
 
-    roots_mp.sort(key=lambda z: (mp.re(z), mp.im(z)))
+    # roots_mp.sort(key=lambda z: (mp.re(z), mp.im(z)))
+    roots_mp.sort(key=lambda z: (
+        mp.re(z),                    # primary
+        abs(z),                      # secondary
+        # tertiary: angle (gives nice symmetric order)
+        mp.atan2(mp.im(z), mp.re(z))
+    ))
     return roots_mp
 
 # ----------------------------- Display ----------------------------- #
