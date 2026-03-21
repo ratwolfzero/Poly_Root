@@ -246,7 +246,7 @@ def plot_combined(coeffs, roots_mp, equation):
         gridspec_kw={'width_ratios': [1, 1.5]}
     )
     fig.canvas.manager.set_window_title(
-        f"Complex Plane and Polynomial Curve in Real Domain")
+        f"Complex Plane and Polynomial Curve")
     fig.suptitle(f"Polynomial: {equation}", wrap=True)
 
     # ---- Complex Plane ----
@@ -257,7 +257,7 @@ def plot_combined(coeffs, roots_mp, equation):
     t = np.linspace(0, 2*np.pi, 200)
     ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5,
              color="gray", label="Unit Circle")
-    ax1.set_title("Complex Plane")
+    ax1.set_title("Roots in Complex Plane")
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
     ax1.legend(loc="best")
@@ -305,7 +305,7 @@ def plot_combined(coeffs, roots_mp, equation):
         ax2.scatter(real_roots, [0]*len(real_roots),
                     color="blue", s=10, zorder=5, label="Real Roots")
 
-    ax2.set_title("Polynomial Curve in Real Domain")   # Fix 2: typo removed
+    ax2.set_title("Polynomial Curve and Roots in Real Domain")   # Fix 2: typo removed
     ax2.set_xlabel("x")
     ax2.set_ylabel("$f(x)$")
     ax2.legend(loc="best")
