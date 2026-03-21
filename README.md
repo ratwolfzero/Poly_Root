@@ -174,6 +174,7 @@ The program outputs
 The displayed value is the **relative residual**. With
     mp.dps = 100
 typical values lie far below the warning threshold of roughly
+
 $$
 10^{-45}
 $$
