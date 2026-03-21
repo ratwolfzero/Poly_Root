@@ -248,7 +248,7 @@ problem of polynomial root finding**.
 Instead, it focuses on **reducing numerical rounding errors** using
 high‑precision arithmetic **while deliberately applying zero artificial
 stabilizations**. The diagnostics let you see the raw, unfiltered
-behaviour of the companion-matrix method — exactly as requested
+behaviour of the companion-matrix method.
 
 ---
 
