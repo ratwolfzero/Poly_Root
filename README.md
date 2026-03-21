@@ -90,7 +90,7 @@ $$
 The eigenvalues of this matrix correspond to the **roots of the
 polynomial**.
 
-### 3. High‑Precision Eigenvalue Solve
+### High‑Precision Eigenvalue Solve
 
 The eigenvalues of the companion matrix are computed using `mpmath.eig`,
 which operates with arbitrary precision.
@@ -107,7 +107,7 @@ whatsoever — no balancing, no scaling, no root polishing, no deflation,
 no Wilkinson's shift, and no cluster handling. All numerical
 difficulties are reported transparently via diagnostics (see section 3).
 
-### 4. Residual Verification
+### Residual Verification
 
 Each computed root $r$ is validated by computing the **relative residual**
 
