@@ -227,7 +227,7 @@ problems.
 
     1 -5 0
 
-    **Expected:** "NOTICE: Polynomial has root at x = 0 → companion matrix is singular." plus conditioning warning.
+    **Expected:** "NOTICE: Polynomial has root at x = 0 → companion matrix is singular."
 
 ### 6. Variant without leading coefficient (negative leading)
 
