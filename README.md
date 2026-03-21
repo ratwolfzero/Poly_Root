@@ -172,17 +172,30 @@ The program outputs
 ## 6. Interpreting Residuals
 
 The displayed value is the **relative residual**. With
+
     mp.dps = 100
+
 typical values lie far below the warning threshold of roughly
 
 $$
 10^{-45}
 $$
 
-A very small relative residual means the root satisfies the equation to
-machine precision, but **does not guarantee high root accuracy** for
-ill-conditioned or multiple-root polynomials. The diagnostics exist
-precisely to highlight such cases
+A very small relative residual indicates that the computed root satisfies
+the polynomial equation to near machine precision. However, this **does
+not guarantee high root accuracy** in cases where the polynomial is
+intrinsically ill-conditioned, such as for multiple roots or highly
+sensitive coefficient-to-root mappings.
+
+Diagnostics (such as conditioning warnings or singular companion
+matrices) describe the numerical difficulty of the **companion matrix
+eigenvalue problem**, not directly the accuracy of the computed roots.
+
+Therefore, it is entirely possible to observe warnings while still
+obtaining highly accurate roots, provided the relative residuals remain
+very small. Conversely, small residuals should always be interpreted in
+the context of the reported diagnostics, especially for ill-conditioned
+problems.
 
 ---
 
