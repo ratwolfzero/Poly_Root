@@ -219,7 +219,7 @@ $(x-1)^{10}$
 
     1 -10 45 -120 210 -252 210 -120 45 -10 1
 
-Remark: Compare default `dps=100`with `dps=400`!
+Remark: Compare default `dps=100`with `dps=200`!
 
 $(x-1)^{20}$
 
