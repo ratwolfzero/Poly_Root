@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # ----------------------------- Input Parsing ----------------------------- #
+
+
 def parse_coefficients(text):
     parts = text.strip().split()
     if len(parts) < 2:
@@ -18,6 +20,7 @@ def parse_coefficients(text):
             "Invalid polynomial: leading zeros reduce this to a constant (no roots).")
     return coeffs
 
+
 def get_coefficients():
     while True:
         try:
@@ -26,6 +29,8 @@ def get_coefficients():
             print(e)
 
 # ----------------------------- Diagnostics ----------------------------- #
+
+
 def coefficient_diagnostics(coeffs):
     mags = [abs(c) for c in coeffs if c != 0]
     if not mags:
@@ -37,6 +42,7 @@ def coefficient_diagnostics(coeffs):
     elif ratio > 1e6:
         print(
             f"NOTICE: Large coefficient scaling (ratio ≈ {mp.nstr(ratio, 4)})")
+
 
 def companion_diagnostics(C):
     try:
@@ -52,6 +58,7 @@ def companion_diagnostics(C):
         print(
             f"NOTICE: Moderately ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
     return cond_number
+
 
 def detect_clusters(roots, tol=mpf('1e-8')):
     """Relative-tolerance cluster detection (scaled to each root's magnitude)."""
@@ -72,6 +79,8 @@ def detect_clusters(roots, tol=mpf('1e-8')):
     return clusters
 
 # ----------------------------- Polynomial Helpers ----------------------------- #
+
+
 def polynomial_string(coeffs):
     def fmt(num):
         if num == int(num):
@@ -97,11 +106,13 @@ def polynomial_string(coeffs):
         return "0 = 0"
     return "".join(terms) + " = 0"
 
+
 def poly_eval(coeffs, x):
     p = mpc(0)
     for c in coeffs:
         p = p * x + c
     return p
+
 
 def relative_residual(coeffs, r):
     numerator = abs(poly_eval(coeffs, r))
@@ -112,6 +123,8 @@ def relative_residual(coeffs, r):
     return numerator / denom if denom != 0 else numerator
 
 # ----------------------------- Companion Matrix ----------------------------- #
+
+
 def build_companion(coeffs):
     leading = coeffs[0]
     if leading == 0:
@@ -130,6 +143,8 @@ def build_companion(coeffs):
     return C, None
 
 # ----------------------------- Root Computation ----------------------------- #
+
+
 def compute_roots(coeffs):
     coefficient_diagnostics(coeffs)
     C, linear_root = build_companion(coeffs)
@@ -164,6 +179,8 @@ def compute_roots(coeffs):
     return roots_mp
 
 # ----------------------------- Display ----------------------------- #
+
+
 def print_roots(coeffs, roots_mp):
     # --- Fixed, human-friendly precision ---
     digits = min(18, max(10, int(0.4 * mp.dps)))
@@ -184,11 +201,11 @@ def print_roots(coeffs, roots_mp):
         res_str = mp.nstr(rel_res, 6)
 
         rows.append((real_str, imag_str, mag_str, res_str))
-																	
+
     # Determine column widths dynamically
     w_real = max(len(r[0]) for r in rows) + 2
     w_imag = max(len(r[1]) for r in rows) + 3
-    w_mag  = max(len(r[2]) for r in rows) + 2
+    w_mag = max(len(r[2]) for r in rows) + 2
 
     total_width = 10 + w_real + w_imag + w_mag + 20
 
@@ -214,6 +231,8 @@ def print_roots(coeffs, roots_mp):
         )
 
 # ----------------------------- Combined Plot ----------------------------- #
+
+
 def plot_combined(coeffs, roots_mp, equation):
     if not roots_mp:
         return
@@ -226,7 +245,8 @@ def plot_combined(coeffs, roots_mp, equation):
         1, 2, figsize=(24, 7),
         gridspec_kw={'width_ratios': [1, 1.5]}
     )
-    fig.canvas.manager.set_window_title(f"Complex Plane and Polynomial Curve in Real Domain")
+    fig.canvas.manager.set_window_title(
+        f"Complex Plane and Polynomial Curve in Real Domain")
     fig.suptitle(f"Polynomial: {equation}", wrap=True)
 
     # ---- Complex Plane ----
@@ -280,7 +300,7 @@ def plot_combined(coeffs, roots_mp, equation):
         ]
     else:
         real_roots = []
-																				   
+
     if real_roots:
         ax2.scatter(real_roots, [0]*len(real_roots),
                     color="blue", s=10, zorder=5, label="Real Roots")
@@ -291,7 +311,7 @@ def plot_combined(coeffs, roots_mp, equation):
     ax2.legend(loc="best")
 
     if max_abs > 1e6:
-        ax2.set_yscale('symlog', linthresh=1e5)                                    
+        ax2.set_yscale('symlog', linthresh=1e5)
         print("NOTICE: symlog y-scale activated (shows naked dynamic range)")
     else:
         ax2.set_ylim(-max_abs * 1.05, max_abs * 1.05)
@@ -301,6 +321,8 @@ def plot_combined(coeffs, roots_mp, equation):
     plt.show()
 
 # ----------------------------- Main ----------------------------- #
+
+
 def solve_and_plot(dps=100):
     mp.dps = dps
     print("\n--- Robust Companion Matrix Polynomial Solver ---")
@@ -312,6 +334,7 @@ def solve_and_plot(dps=100):
     if roots_mp:
         print_roots(coeffs, roots_mp)
         plot_combined(coeffs, roots_mp, equation)
+
 
 if __name__ == "__main__":
     solve_and_plot()
