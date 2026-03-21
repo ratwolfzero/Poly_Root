@@ -259,23 +259,24 @@ def plot_combined(coeffs, roots_mp, equation):
     ax1.axhline(0, lw=1)
     ax1.axvline(0, lw=1)
     ax1.scatter(roots_np.real, roots_np.imag, color="red",
-                s=10, zorder=5, label="Roots")
+            s=10, zorder=5, label="Roots")
     t = np.linspace(0, 2*np.pi, 200)
     ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5,
-             color="gray", label="Unit Circle")
+         color="gray", label="Unit Circle")
+
+    # === SCALING ===
+    max_modulus = np.max(np.abs(roots_np)) if roots_np.size > 0 else 0
+    view_radius = 1.1 * max(max_modulus, 1.0)   # always at least the unit circle
+
+    ax1.set_xlim(-view_radius, view_radius)
+    ax1.set_ylim(-view_radius, view_radius)
+    ax1.set_aspect('equal', adjustable='box')   # ← keeps perfect circle
+
     ax1.set_title("Roots in Complex Plane")
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
     ax1.legend(loc="best")
     ax1.grid(True, linestyle=":", alpha=0.6)
-
-    max_real = np.max(np.abs(roots_np.real))
-    max_imag = np.max(np.abs(roots_np.imag))
-    max_range = max(max_real, max_imag, 1e-6)
-    pad = 1.1 * max_range
-    ax1.set_xlim(-pad, pad)
-    ax1.set_ylim(-pad, pad)
-    ax1.set_aspect('equal', adjustable='box')
 
     # ---- Polynomial Curve ----
     real_parts = [float(mp.re(r)) for r in roots_mp]
