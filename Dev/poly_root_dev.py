@@ -167,7 +167,7 @@ def compute_roots(coeffs):
     if max(abs_residuals, default=0) > 1:
         print(f"WARNING: Large absolute residuals")
 
-    # Fix 4: scale residual warning to working precision
+    # Scale residual warning to working precision
     expected_res = mpf(10) ** (-mp.dps // 2 + 5)
     if max(rel_residuals, default=0) > expected_res:
         print(f"WARNING: Large relative residuals (expected ~1e{-mp.dps//2})")
@@ -182,7 +182,7 @@ def compute_roots(coeffs):
 
 
 def print_roots(coeffs, roots_mp):
-    # --- Fixed, human-friendly precision ---
+    # --- Human-friendly precision ---
     digits = min(18, max(10, int(0.4 * mp.dps)))
 
     # Precompute strings
@@ -280,7 +280,7 @@ def plot_combined(coeffs, roots_mp, equation):
     y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx))))
                        for xx in x_vals])
 
-    # Fix 2: prevent float overflow crash
+    # Prevent float overflow crash
     max_abs = np.max(np.abs(y_vals)) if len(y_vals) > 0 else 1.0
     if np.isinf(max_abs) or max_abs > 1e300:
         print("NOTICE: Polynomial values exceed float range → clipping plot")
@@ -291,7 +291,7 @@ def plot_combined(coeffs, roots_mp, equation):
     ax2.axhline(0, lw=1)
     ax2.axvline(0, lw=1)
 
-    # Fix 3: relative tolerance for real-root detection
+    # Relative tolerance for real-root detection
     if roots_mp:
         max_mag = max(abs(mp.re(r)) for r in roots_mp)
         tol = mpf('1e-10') * max(mpf(1), max_mag)
