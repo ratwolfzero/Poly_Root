@@ -283,15 +283,35 @@ def plot_combined(coeffs, roots_mp, equation):
     # ============================================================================
 
     # ====================== POLYNOMIAL CURVE (improved symlog) ======================
-    # x-range (unchanged logic, just cleaner)
+    # --- First, compute real roots (needed both for x_vals insertion and later plotting) ---
+    if roots_mp:
+        max_mag = max(abs(mp.re(r)) for r in roots_mp)
+        tol = mpf('1e-10') * max(mpf(1), max_mag)
+        real_roots = [
+            float(mp.re(r)) for r in roots_mp if abs(mp.im(r)) < tol
+        ]
+    else:
+        real_roots = []
+
+    # --- Build x values, including real roots ---
     real_parts = [float(mp.re(r)) for r in roots_mp]
     spread = max(real_parts) - min(real_parts) if real_parts else 1.0
     x_center = sum(real_parts) / len(real_parts) if real_parts else 0.0
     x_pad = 1.5 * max(spread, 1.0)
-    x_vals = np.linspace(x_center - x_pad, x_center + x_pad, 2000)
 
-    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx))))
-                       for xx in x_vals])
+    # Initial sampling (20000 points, as in your code)
+    x_vals_initial = np.linspace(x_center - x_pad, x_center + x_pad, 2000)
+
+    # Insert each real root (if not already in the list)
+    x_list = x_vals_initial.tolist()
+    for root in real_roots:
+        if not any(abs(root - x) < 1e-12 for x in x_list):
+            x_list.append(root)
+    x_list.sort()
+    x_vals = np.array(x_list)
+
+    # Evaluate polynomial at every x (high precision)
+    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx)))) for xx in x_vals])
 
     # Prevent float overflow crash
     max_abs = np.max(np.abs(y_vals)) if len(y_vals) > 0 else 1.0
@@ -304,23 +324,12 @@ def plot_combined(coeffs, roots_mp, equation):
     ax2.axhline(0, lw=1)
     ax2.axvline(0, lw=1)
 
-    # Real-root markers
-    if roots_mp:
-        max_mag = max(abs(mp.re(r)) for r in roots_mp)
-        tol = mpf('1e-10') * max(mpf(1), max_mag)
-        real_roots = [
-            float(mp.re(r)) for r in roots_mp if abs(mp.im(r)) < tol
-        ]
-    else:
-        real_roots = []
-
+    # Real-root markers (reuse the already computed real_roots list)
     if real_roots:
         ax2.scatter(real_roots, [0]*len(real_roots),
                     color="blue", s=10, zorder=5, label="Real Roots")
 
     # IMPROVED SYMLOG: tight linear region around y=0
-    # → near-zero details (crossings, wiggles) are now clearly visible
-    # → huge peaks still compressed in log
     if max_abs > 1e6:
         linthresh = 1.0
         ax2.set_yscale('symlog', linthresh=linthresh, linscale=1.0)
