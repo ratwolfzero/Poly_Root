@@ -242,6 +242,7 @@ def print_roots(coeffs, roots_mp):
 def plot_combined(coeffs, roots_mp, equation):
     if not roots_mp:
         return
+
     roots_np = np.array([
         complex(float(mp.re(z)), float(mp.im(z)))
         for z in roots_mp
@@ -255,35 +256,40 @@ def plot_combined(coeffs, roots_mp, equation):
         f"Complex Plane and Polynomial Curve")
     fig.suptitle(f"Polynomial: {equation}", wrap=True)
 
-    # ---- Complex Plane ----
+    # ====================== COMPLEX PLANE (improved scaling) ======================
     ax1.axhline(0, lw=1)
     ax1.axvline(0, lw=1)
     ax1.scatter(roots_np.real, roots_np.imag, color="red",
-            s=10, zorder=5, label="Roots")
+                s=10, zorder=5, label="Roots")
     t = np.linspace(0, 2*np.pi, 200)
     ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5,
-         color="gray", label="Unit Circle")
+             color="gray", label="Unit Circle")
 
-    # === SCALING ===
+    # NEW: clean, robust scaling based on true modulus
+    # → always shows full unit circle + all roots
+    # → perfect square aspect (no distortion)
     max_modulus = np.max(np.abs(roots_np)) if roots_np.size > 0 else 0
-    view_radius = 1.1 * max(max_modulus, 1.0)   # always at least the unit circle
+    view_radius = 1.1 * max(max_modulus, 1.0)
 
     ax1.set_xlim(-view_radius, view_radius)
     ax1.set_ylim(-view_radius, view_radius)
-    ax1.set_aspect('equal', adjustable='box')   # ← keeps perfect circle
+    ax1.set_aspect('equal', adjustable='box')
 
     ax1.set_title("Roots in Complex Plane")
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
     ax1.legend(loc="best")
     ax1.grid(True, linestyle=":", alpha=0.6)
+    # ============================================================================
 
-    # ---- Polynomial Curve ----
+    # ====================== POLYNOMIAL CURVE (improved symlog) ======================
+    # x-range (unchanged logic, just cleaner)
     real_parts = [float(mp.re(r)) for r in roots_mp]
-    spread = max(real_parts) - min(real_parts)
-    x_center = sum(real_parts) / len(real_parts)
+    spread = max(real_parts) - min(real_parts) if real_parts else 1.0
+    x_center = sum(real_parts) / len(real_parts) if real_parts else 0.0
     x_pad = 1.5 * max(spread, 1.0)
     x_vals = np.linspace(x_center - x_pad, x_center + x_pad, 2000)
+
     y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx))))
                        for xx in x_vals])
 
@@ -298,7 +304,7 @@ def plot_combined(coeffs, roots_mp, equation):
     ax2.axhline(0, lw=1)
     ax2.axvline(0, lw=1)
 
-    # Relative tolerance for real-root detection
+    # Real-root markers
     if roots_mp:
         max_mag = max(abs(mp.re(r)) for r in roots_mp)
         tol = mpf('1e-10') * max(mpf(1), max_mag)
@@ -312,18 +318,22 @@ def plot_combined(coeffs, roots_mp, equation):
         ax2.scatter(real_roots, [0]*len(real_roots),
                     color="blue", s=10, zorder=5, label="Real Roots")
 
-    # Fix 2: typo removed
+    # IMPROVED SYMLOG: tight linear region around y=0
+    # → near-zero details (crossings, wiggles) are now clearly visible
+    # → huge peaks still compressed in log
+    if max_abs > 1e6:
+        linthresh = 1.0
+        ax2.set_yscale('symlog', linthresh=linthresh, linscale=1.0)
+        print(f"NOTICE: symlog y-scale activated (linthresh = {linthresh})")
+    else:
+        ax2.set_ylim(-max_abs * 1.05, max_abs * 1.05)
+
     ax2.set_title("Polynomial Curve and Roots in Real Domain")
     ax2.set_xlabel("x")
     ax2.set_ylabel("$f(x)$")
     ax2.legend(loc="best")
-
-    if max_abs > 1e6:
-        ax2.set_yscale('symlog', linthresh=1e5)
-        print("NOTICE: symlog y-scale activated (shows naked dynamic range)")
-    else:
-        ax2.set_ylim(-max_abs * 1.05, max_abs * 1.05)
     ax2.grid(True, linestyle=":", alpha=0.7)
+    # ============================================================================
 
     plt.subplots_adjust(top=0.85)
     plt.show()
