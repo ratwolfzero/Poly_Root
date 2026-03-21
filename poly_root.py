@@ -282,7 +282,7 @@ def plot_combined(coeffs, roots_mp, equation):
     ax1.grid(True, linestyle=":", alpha=0.6)
     # ============================================================================
 
-    # ====================== POLYNOMIAL CURVE (improved symlog) ======================
+    # ====================== POLYNOMIAL CURVE  ======================
     # --- First, compute real roots (needed both for x_vals insertion and later plotting) ---
     if roots_mp:
         max_mag = max(abs(mp.re(r)) for r in roots_mp)
@@ -297,10 +297,10 @@ def plot_combined(coeffs, roots_mp, equation):
     real_parts = [float(mp.re(r)) for r in roots_mp]
     spread = max(real_parts) - min(real_parts) if real_parts else 1.0
     x_center = sum(real_parts) / len(real_parts) if real_parts else 0.0
-    x_pad = 1.5 * max(spread, 1.0)
+    x_pad = 1.1 * max(spread, 1.0)
 
-    # Initial sampling (20000 points, as in your code)
-    x_vals_initial = np.linspace(x_center - x_pad, x_center + x_pad, 2000)
+    # Initial sampling 
+    x_vals_initial = np.linspace(x_center - x_pad, x_center + x_pad, 5000)
 
     # Insert each real root (if not already in the list)
     x_list = x_vals_initial.tolist()
