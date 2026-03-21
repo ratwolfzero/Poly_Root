@@ -24,9 +24,11 @@ arithmetic**. The mapping from coefficients to roots can be extremely
 sensitive to perturbations, a phenomenon illustrated by **Wilkinson's
 example**.
 For a polynomial
+
 $$
 P(x) = a_n x^n + a_{n-1} x^{n-1} + \dots + a_1 x + a_0
 $$
+
 small changes in coefficients may produce large changes in the roots.
 This sensitivity is an inherent mathematical property and **cannot be
 fully eliminated by any algorithm**.
@@ -44,6 +46,7 @@ plane.
 Polynomials containing **multiple roots** are particularly
 ill-conditioned. Near a root of multiplicity $m$, small perturbations in
 coefficients can produce root shifts approximately proportional to
+
 $$
 |\Delta x| \sim |\Delta a|^{1/m}
 $$
@@ -72,6 +75,7 @@ by the leading coefficient.
 
 A companion matrix $C$ is constructed such that its **characteristic
 polynomial corresponds to the normalized polynomial**:
+
 $$
 C =
 \begin{pmatrix}
@@ -82,6 +86,7 @@ C =
 0 & 0 & \dots & 1 & -a_{n-1}/a_n
 \end{pmatrix}
 $$
+
 The eigenvalues of this matrix correspond to the **roots of the
 polynomial**.
 
@@ -105,6 +110,7 @@ difficulties are reported transparently via diagnostics (see section 3).
 ### 4. Residual Verification
 
 Each computed root $r$ is validated by computing the **relative residual**
+
 $$
 \frac{|P(r)|}{\sum |a_i| \cdot |r|^{n-i}}
 $$
