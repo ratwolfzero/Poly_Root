@@ -66,12 +66,12 @@ Newton--Raphson or specialized polynomial solvers like Jenkins--Traub,
 this solver computes all roots simultaneously using the **Companion
 Matrix Eigenvalue Method**.
 
-### 1. Normalization
+### Normalization
 
 The polynomial is converted to monic form by dividing all coefficients
 by the leading coefficient.
 
-### 2. Matrix Construction
+### Matrix Construction
 
 A companion matrix $C$ is constructed such that its **characteristic
 polynomial corresponds to the normalized polynomial**:
