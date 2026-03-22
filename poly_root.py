@@ -188,25 +188,26 @@ def compute_roots(coeffs):
 
 
 def print_roots(coeffs, roots_mp):
+    if not roots_mp:
+        print("No roots to display.")
+        return
+
     # --- Human-friendly precision ---
     digits = min(18, max(10, int(0.4 * mp.dps)))
 
-    # Precompute strings
-    rows = []
-    for r in roots_mp:
+    # convenience formatter for each root
+    def format_root(r):
         rel_res = relative_residual(coeffs, r)
-
         real_str = mp.nstr(mp.re(r), digits)
-
         imag_val = mp.im(r)
         imag_str = mp.nstr(imag_val, digits)
         if imag_val >= 0:
             imag_str = "+" + imag_str
-
         mag_str = mp.nstr(abs(r), digits)
         res_str = mp.nstr(rel_res, 6)
+        return real_str, imag_str, mag_str, res_str
 
-        rows.append((real_str, imag_str, mag_str, res_str))
+    rows = [format_root(r) for r in roots_mp]
 
     # Determine column widths dynamically
     w_real = max(len(r[0]) for r in rows) + 2
