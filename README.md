@@ -205,13 +205,13 @@ problems.
 
     1 -210 20615 -1256850 53327946 -1672280820 40171771630 -756111184500 11310276995381 -135585182899530 1307535010540395 -10142299865511450 63030812099294896 -311333643161390640 1206647803780373360 -3599979517947607200 8037811822645051776 -12870931245150988800 13803759753640704000 -8752948036761600000 2432902008176640000
 
-    **Expected diagnostics:** extreme coefficient scaling + ill-conditioned matrix.
+**Expected diagnostics:** extreme coefficient scaling + ill-conditioned matrix.
 
 ### 2. Wilkinson-style with multiplicity 4 (roots 1–5 each multiplicity 4)
 
     1 -60 1690 -29700 365071 -3334800 23477380 -130374600 579693631 -2082967740 6077950570 -14418383700 27741179521 -43026101880 53234263960 -51699564000 38463221776 -21114635520 8041766400 -1893888000 207360000
 
-    **Expected diagnostics:** scaling, ill-conditioned matrix, clustered roots (exactly as in the example run).
+**Expected diagnostics:** scaling, ill-conditioned matrix, clustered roots (exactly as in the example run).
 
 ### 3. Extreme high-multiplicity real root
 
@@ -231,13 +231,13 @@ Remark: Compare default `dps=100`with `dps=400`!
 
     1 0 5 0 10 0 10 0 5 0 1
 
-    **Expected:** clustered roots notice (five identical roots at $i$ and at $-i$).
+**Expected:** clustered roots notice (five identical roots at $i$ and at $-i$).
 
 ### 5. Explicit root at zero (singular companion matrix)
 
     1 -5 0
 
-    **Expected:** "NOTICE: Polynomial has root at x = 0 → companion matrix is singular."
+**Expected:** "NOTICE: Polynomial has root at x = 0 → companion matrix is singular."
 
 ### 6. Variant without leading coefficient (negative leading)
 
