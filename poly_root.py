@@ -256,7 +256,7 @@ def plot_combined(coeffs, roots_mp, equation):
         f"Complex Plane and Polynomial Curve")
     fig.suptitle(f"Polynomial: {equation}", wrap=True)
 
-    # ====================== COMPLEX PLANE (improved scaling) ======================
+    # ====================== COMPLEX PLANE ======================
     ax1.axhline(0, lw=1)
     ax1.axvline(0, lw=1)
     ax1.scatter(roots_np.real, roots_np.imag, color="red",
@@ -265,25 +265,20 @@ def plot_combined(coeffs, roots_mp, equation):
     ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5,
              color="gray", label="Unit Circle")
 
-    # NEW: clean, robust scaling based on true modulus
-    # → always shows full unit circle + all roots
-    # → perfect square aspect (no distortion)
     max_modulus = np.max(np.abs(roots_np)) if roots_np.size > 0 else 0
     view_radius = 1.1 * max(max_modulus, 1.0)
 
     ax1.set_xlim(-view_radius, view_radius)
     ax1.set_ylim(-view_radius, view_radius)
     ax1.set_aspect('equal', adjustable='box')
-
     ax1.set_title("Roots in Complex Plane")
     ax1.set_xlabel("Real")
     ax1.set_ylabel("Imaginary")
     ax1.legend(loc="best")
     ax1.grid(True, linestyle=":", alpha=0.6)
-    # ============================================================================
 
-    # ====================== POLYNOMIAL CURVE  ======================
-    # --- First, compute real roots (needed both for x_vals insertion and later plotting) ---
+    # ====================== POLYNOMIAL CURVE ======================
+    # First, compute real roots (needed for insertion and markers)
     if roots_mp:
         max_mag = max(abs(mp.re(r)) for r in roots_mp)
         tol = mpf('1e-10') * max(mpf(1), max_mag)
@@ -293,16 +288,16 @@ def plot_combined(coeffs, roots_mp, equation):
     else:
         real_roots = []
 
-    # --- Build x values, including real roots ---
+    # Build x values including real roots
     real_parts = [float(mp.re(r)) for r in roots_mp]
     spread = max(real_parts) - min(real_parts) if real_parts else 1.0
     x_center = sum(real_parts) / len(real_parts) if real_parts else 0.0
-    x_pad = 1.1 * max(spread, 1.0)
+    x_pad = 1.5 * max(spread, 1.0)
 
-    # Initial sampling 
-    x_vals_initial = np.linspace(x_center - x_pad, x_center + x_pad, 5000)
+    # Initial sampling (use 2000 for speed; increase if needed)
+    x_vals_initial = np.linspace(x_center - x_pad, x_center + x_pad, 2000)
 
-    # Insert each real root (if not already in the list)
+    # Insert each real root (if not already present)
     x_list = x_vals_initial.tolist()
     for root in real_roots:
         if not any(abs(root - x) < 1e-12 for x in x_list):
@@ -310,27 +305,26 @@ def plot_combined(coeffs, roots_mp, equation):
     x_list.sort()
     x_vals = np.array(x_list)
 
-    # Evaluate polynomial at every x (high precision)
-    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx))))
-                      for xx in x_vals])
+    # Evaluate polynomial at each x (high precision)
+    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx)))) for xx in x_vals])
 
-    # Prevent float overflow crash
+    # Prevent overflow
     max_abs = np.max(np.abs(y_vals)) if len(y_vals) > 0 else 1.0
     if np.isinf(max_abs) or max_abs > 1e300:
         print("NOTICE: Polynomial values exceed float range → clipping plot")
         y_vals = np.clip(y_vals, -1e300, 1e300)
         max_abs = 1e300
 
+    # Plot curve and markers
     ax2.plot(x_vals, y_vals, lw=1, label=f"p(x)")
     ax2.axhline(0, lw=1)
     ax2.axvline(0, lw=1)
 
-    # Real-root markers (reuse the already computed real_roots list)
     if real_roots:
         ax2.scatter(real_roots, [0]*len(real_roots),
                     color="blue", s=10, zorder=5, label="Real Roots")
 
-    # IMPROVED SYMLOG: tight linear region around y=0
+    # Initial scale setting
     if max_abs > 1e6:
         linthresh = 1.0
         ax2.set_yscale('symlog', linthresh=linthresh, linscale=1.0)
@@ -343,9 +337,23 @@ def plot_combined(coeffs, roots_mp, equation):
     ax2.set_ylabel("$f(x)$")
     ax2.legend(loc="best")
     ax2.grid(True, linestyle=":", alpha=0.7)
-    # ============================================================================
 
     plt.subplots_adjust(top=0.85)
+
+    # ---------- Interactive scale toggle ----------
+    def on_key(event):
+        if event.key == 'l':
+            ax2.set_yscale('linear')
+            ax2.set_ylim(-max_abs * 1.05, max_abs * 1.05)
+            fig.canvas.draw_idle()
+            print("Switched to linear scale")
+        elif event.key == 'y':
+            ax2.set_yscale('symlog', linthresh=1.0, linscale=1.0)
+            fig.canvas.draw_idle()
+            print("Switched to symlog scale")
+    fig.canvas.mpl_connect('key_press_event', on_key)
+    # ----------------------------------------------
+
     plt.show()
 
 # ----------------------------- Main ----------------------------- #
