@@ -306,7 +306,8 @@ def plot_combined(coeffs, roots_mp, equation):
     x_vals = np.array(x_list)
 
     # Evaluate polynomial at each x (high precision)
-    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx)))) for xx in x_vals])
+    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx))))
+                      for xx in x_vals])
 
     # Prevent overflow
     max_abs = np.max(np.abs(y_vals)) if len(y_vals) > 0 else 1.0
