@@ -165,7 +165,7 @@ The program outputs
 - Polynomial degree
 - Polynomial equation string
 - Computed roots with relative residuals
-- A combined plot (complex plane + real-domain curve)
+- A combined plot (complex plane + real-domain curve) --> use the "l" and "y" key to toggle between linear and symlog scale
 
 ---
 
