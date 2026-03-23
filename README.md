@@ -24,9 +24,11 @@ arithmetic**. The mapping from coefficients to roots can be extremely
 sensitive to perturbations, a phenomenon illustrated by **Wilkinson's
 example**.
 For a polynomial
+
 $$
 P(x) = a_n x^n + a_{n-1} x^{n-1} + \dots + a_1 x + a_0
 $$
+
 small changes in coefficients may produce large changes in the roots.
 This sensitivity is an inherent mathematical property and **cannot be
 fully eliminated by any algorithm**.
@@ -45,9 +47,11 @@ plane.
 Polynomials containing **multiple roots** are particularly
 ill-conditioned. Near a root of multiplicity $m$, small perturbations in
 coefficients can produce root shifts approximately proportional to
+
 $$
 |\Delta x| \sim |\Delta a|^{1/m}
 $$
+
 This means even extremely small coefficient perturbations may split a
 multiple root into a cluster of nearby roots.
 High‑precision arithmetic helps ensure that such behavior reflects the
@@ -84,6 +88,7 @@ a non-zero constant term.
 A companion matrix $C$ is constructed for the **deflated**
 monic polynomial such that its characteristic polynomial corresponds
 exactly to the reduced polynomial:
+
 $$
 C =
 \begin{pmatrix}
@@ -94,6 +99,7 @@ C =
 0 & 0 & \dots & 1 & -a_{n-1}/a_n
 \end{pmatrix}
 $$
+
 The eigenvalues of this matrix correspond to the **roots of the
 polynomial**.
 
@@ -119,9 +125,11 @@ difficulties are reported transparently via diagnostics (see section 3).
 ### Residual Verification
 
 Each computed root $r$ is validated by computing the **relative residual**
+
 $$
 \frac{|P(r)|}{\sum |a_i| \cdot |r|^{n-i}}
 $$
+
 This measures **how well the computed value satisfies the polynomial
 equation relative to its magnitude**. Residuals are displayed for every
 root
@@ -182,9 +190,11 @@ The program outputs
 The displayed value is the **relative residual**. With
     mp.dps = 100
 typical values lie far below the warning threshold of roughly
+
 $$
 10^{-45}
 $$
+
 A very small relative residual indicates that the computed root satisfies
 the polynomial equation to near machine precision. However, this **does
 not guarantee high root accuracy** in cases where the polynomial is
