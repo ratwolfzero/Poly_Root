@@ -44,19 +44,24 @@ def coefficient_diagnostics(coeffs):
             f"NOTICE: Large coefficient scaling (ratio ≈ {mp.nstr(ratio, 4)})")
 
 
-def companion_diagnostics(C):
+def companion_diagnostics(C, structural_singular=False):
+    # Skip meaningless condition number if singular by construction
+    if structural_singular:
+        print("INFO: Companion matrix is singular by construction (numerically safe).")
+        return None
+
     try:
         cond_number = mp.norm(C, 1) * mp.norm(C**-1, 1)
     except Exception:
         cond_number = mp.inf
+
     if cond_number == mp.inf:
-        print("WARNING: Companion matrix is singular or near-singular.")
+        print("WARNING: Companion matrix is singular or numerically unstable.")
     elif cond_number > 1e12:
-        print(
-            f"WARNING: Ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
+        print(f"WARNING: Ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
     elif cond_number > 1e6:
-        print(
-            f"NOTICE: Moderately ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
+        print(f"NOTICE: Moderately ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
+
     return cond_number
 
 
@@ -129,29 +134,39 @@ def build_companion(coeffs):
     leading = coeffs[0]
     if leading == 0:
         raise ZeroDivisionError("Leading coefficient cannot be zero.")
-    if coeffs[-1] == 0:
-        print("NOTICE: Polynomial has root at x = 0 → companion matrix is singular.")
+
+    has_zero_root = (coeffs[-1] == 0)
+
+    if has_zero_root:
+        print("NOTICE: Polynomial has root at x = 0")
+
     a = [c / leading for c in coeffs[1:]]
     n = len(a)
+
     if n == 1:
-        return None, [-a[0]]
+        return None, [-a[0]], has_zero_root
+
     C = matrix(n)
     for row in range(1, n):
         C[row, row - 1] = mpf(1)
+
     for row in range(n):
         C[row, n - 1] = -a[n - 1 - row]
-    return C, None
+
+    return C, None, has_zero_root
 
 # ----------------------------- Root Computation ----------------------------- #
 
 
 def compute_roots(coeffs):
     coefficient_diagnostics(coeffs)
-    C, linear_root = build_companion(coeffs)
+
+    C, linear_root, has_zero_root = build_companion(coeffs)
+
     if linear_root is not None:
         roots_mp = [mpc(linear_root[0])]
     else:
-        companion_diagnostics(C)
+        companion_diagnostics(C, structural_singular=has_zero_root)
         try:
             eigenvalues = eig(C, left=False, right=False)
             roots_mp = [mpc(ev) for ev in eigenvalues]
@@ -165,9 +180,8 @@ def compute_roots(coeffs):
     rel_residuals = [relative_residual(coeffs, r) for r in roots_mp]
 
     if max(abs_residuals, default=0) > 1:
-        print(f"WARNING: Large absolute residuals")
+        print("WARNING: Large absolute residuals")
 
-    # Scale residual warning to working precision
     expected_res = mpf(10) ** (-mp.dps // 2 + 5)
     if max(rel_residuals, default=0) > expected_res:
         print(f"WARNING: Large relative residuals (expected ~1e{-mp.dps//2})")
@@ -175,13 +189,12 @@ def compute_roots(coeffs):
     if detect_clusters(roots_mp):
         print("NOTICE: Clustered roots detected → high sensitivity likely.")
 
-    # roots_mp.sort(key=lambda z: (mp.re(z), mp.im(z)))
     roots_mp.sort(key=lambda z: (
-        mp.re(z),                    # primary
-        abs(z),                      # secondary
-        # tertiary: angle (gives nice symmetric order)
+        mp.re(z),
+        abs(z),
         mp.atan2(mp.im(z), mp.re(z))
     ))
+
     return roots_mp
 
 # ----------------------------- Display ----------------------------- #
@@ -317,7 +330,7 @@ def plot_complex_plane(ax, roots_mp):
 
     ax.set_xlim(-view_radius, view_radius)
     ax.set_ylim(-view_radius, view_radius)
-    ax.set_aspect('equal', adjustable='box')
+    ax.set_aspect('equal', adjustable='datalim')
     ax.set_title("Roots in Complex Plane")
     ax.set_xlabel("Real")
     ax.set_ylabel("Imaginary")
