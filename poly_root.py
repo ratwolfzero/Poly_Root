@@ -127,6 +127,14 @@ def relative_residual(coeffs, r):
         denom += abs(c) * abs(r) ** (n - i)
     return numerator / denom if denom != 0 else numerator
 
+
+def root_tolerance(roots):
+    """Compute consistent tolerance based on root magnitudes."""
+    if not roots:
+        return mpf('1e-10')
+    max_mag = max(abs(r) for r in roots)
+    return mpf('1e-10') * max(mpf(1), max_mag)
+
 # ----------------------------- Companion Matrix ----------------------------- #
 
 
@@ -198,14 +206,6 @@ def compute_roots(coeffs):
     return roots_mp
 
 # ----------------------------- Display ----------------------------- #
-
-
-def root_tolerance(roots):
-    """Compute consistent tolerance based on root magnitudes."""
-    if not roots:
-        return mpf('1e-10')
-    max_mag = max(abs(r) for r in roots)
-    return mpf('1e-10') * max(mpf(1), max_mag)
 
 
 def print_roots(coeffs, roots_mp):
