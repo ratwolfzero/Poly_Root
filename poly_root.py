@@ -58,9 +58,11 @@ def companion_diagnostics(C, structural_singular=False):
     if cond_number == mp.inf:
         print("WARNING: Companion matrix is singular or numerically unstable.")
     elif cond_number > 1e12:
-        print(f"WARNING: Ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
+        print(
+            f"WARNING: Ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
     elif cond_number > 1e6:
-        print(f"NOTICE: Moderately ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
+        print(
+            f"NOTICE: Moderately ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
 
     return cond_number
 
@@ -311,6 +313,7 @@ def print_roots(coeffs, roots_mp):
         idx += 1
 # ----------------------------- Combined Plot ----------------------------- #
 
+
 def plot_complex_plane(ax, roots_mp):
     roots_np = np.array([
         complex(float(mp.re(z)), float(mp.im(z)))
@@ -320,10 +323,10 @@ def plot_complex_plane(ax, roots_mp):
     ax.axhline(0, lw=1)
     ax.axvline(0, lw=1)
     ax.scatter(roots_np.real, roots_np.imag, color="red",
-                s=10, zorder=5, label="Roots")
+               s=10, zorder=5, label="Roots")
     t = np.linspace(0, 2*np.pi, 200)
     ax.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5,
-             color="gray", label="Unit Circle")
+            color="gray", label="Unit Circle")
 
     max_modulus = np.max(np.abs(roots_np)) if roots_np.size > 0 else 0
     view_radius = 1.1 * max(max_modulus, 1.0)
@@ -383,7 +386,7 @@ def plot_polynomial_curve(ax, coeffs, roots_mp):
 
     if real_roots:
         ax.scatter(real_roots, [0]*len(real_roots),
-                    color="blue", s=10, zorder=5, label="Real Roots")
+                   color="blue", s=10, zorder=5, label="Real Roots")
 
     # Initial scale setting
     if max_abs > 1e6:
