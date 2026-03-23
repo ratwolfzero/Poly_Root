@@ -333,7 +333,6 @@ def plot_complex_plane(ax, roots_mp):
 
     ax.set_xlim(-view_radius, view_radius)
     ax.set_ylim(-view_radius, view_radius)
-    ax.set_aspect('equal', adjustable='datalim')
     ax.set_title("Roots in Complex Plane")
     ax.set_xlabel("Real")
     ax.set_ylabel("Imaginary")
