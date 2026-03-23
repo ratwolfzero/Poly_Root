@@ -115,6 +115,10 @@ precision.
 Increasing `mp.dps` increases the precision used during both the
 eigenvalue computation and polynomial evaluation.
 
+### Display Normalization (cosmetic only)
+
+Theoretically real roots are sometimes returned by `mpmath.eig` with a tiny imaginary part (~10^{-100} or smaller) due to rounding in the QR algorithm. For human-readable output these imaginary parts are snapped to exactly zero. This step is **purely cosmetic** and does not affect the computed roots, the residuals used for warnings, or any internal calculation.
+
 **Important (non-artificial approach):** The solver uses the **raw,
 unmodified companion matrix** *(after exact algebraic deflation of any
 roots at zero)* with **no artificial improvements** whatsoever — no
