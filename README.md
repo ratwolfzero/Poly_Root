@@ -216,31 +216,39 @@ problems.
 ### 1. Classic Wilkinson Polynomial (distinct roots 1–20)
 
     1 -210 20615 -1256850 53327946 -1672280820 40171771630 -756111184500 11310276995381 -135585182899530 1307535010540395 -10142299865511450 63030812099294896 -311333643161390640 1206647803780373360 -3599979517947607200 8037811822645051776 -12870931245150988800 13803759753640704000 -8752948036761600000 2432902008176640000
+
 Expected diagnostics: extreme coefficient scaling + ill-conditioned matrix.
 
 ### 2. Wilkinson-style with multiplicity 4 (roots 1–5 each multiplicity 4)
 
     1 -60 1690 -29700 365071 -3334800 23477380 -130374600 579693631 -2082967740 6077950570 -14418383700 27741179521 -43026101880 53234263960 -51699564000 38463221776 -21114635520 8041766400 -1893888000 207360000
+
 Expected diagnostics: scaling, ill-conditioned matrix, clustered roots (exactly as in the example run).
 
 ### 3. Extreme high-multiplicity real root
 
 $(x-1)^{10}$
+
     1 -10 45 -120 210 -252 210 -120 45 -10 1
+
 Remark: Compare default `dps=100`with `dps=200`!
 
 $(x-1)^{20}$
+
     1 -20 190 -1140 4845 -15504 38760 -77520 125970 -167960 184756 -167960 125970 -77520 38760 -15504 4845 -1140 190 -20 1
+
 Remark: Compare default `dps=100`with `dps=400`!
 
 ### 4. High-multiplicity complex roots: $(x^2 + 1)^5$
 
     1 0 5 0 10 0 10 0 5 0 1
+
 Expected: clustered roots notice (five identical roots at $i$ and at $-i$).
 
 ### 5. Explicit root at zero
 
     1 -5 0
+
 Expected:  
 `NOTICE: Polynomial has 1 root(s) at x = 0`  
 The zero root appears with **Rel.Residual = 0** and there is **no**
@@ -255,7 +263,7 @@ large-residual warning and **no** singular-matrix message.
     1 0 0 0 0 100000000000000000000
 
     1 0 -1000101 0 101000100 0 -100000000
-    
+
     524288 0 -2621440 0 +5570560 0 -6553600 0 +4845120 0 -2325120 0 +715400 0 -133760 0 +14400 0 -800 0 1
 
 ---
