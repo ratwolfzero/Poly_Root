@@ -187,15 +187,60 @@ def compute_roots(coeffs):
 # ----------------------------- Display ----------------------------- #
 
 
+def root_tolerance(roots):
+    """Compute consistent tolerance based on root magnitudes."""
+    if not roots:
+        return mpf('1e-10')
+    max_mag = max(abs(r) for r in roots)
+    return mpf('1e-10') * max(mpf(1), max_mag)
+
+
 def print_roots(coeffs, roots_mp):
     if not roots_mp:
         print("No roots to display.")
         return
 
     # --- Human-friendly precision ---
-    digits = min(18, max(10, int(0.4 * mp.dps)))
+    digits = min(6, max(10, int(0.4 * mp.dps)))
 
-    # convenience formatter for each root
+    tol = root_tolerance(roots_mp)
+
+    # ---------- Normalize roots (snap tiny imaginary parts) ----------
+    normalized = []
+    for r in roots_mp:
+        imag = mp.im(r)
+        if abs(imag) < tol:
+            imag = mpf(0)
+        normalized.append(mpc(mp.re(r), imag))
+
+    # ---------- Separate real and complex ----------
+    real_roots = [r for r in normalized if mp.im(r) == 0]
+    complex_roots = [r for r in normalized if mp.im(r) != 0]
+
+    # ---------- Group conjugate pairs ----------
+    used = [False] * len(complex_roots)
+    pairs = []
+    leftovers = []
+
+    for i, r1 in enumerate(complex_roots):
+        if used[i]:
+            continue
+        conj = mpc(mp.re(r1), -mp.im(r1))
+        found = False
+
+        for j, r2 in enumerate(complex_roots):
+            if i != j and not used[j]:
+                if abs(r2 - conj) < tol:
+                    pairs.append((r1, r2))
+                    used[i] = used[j] = True
+                    found = True
+                    break
+
+        if not found:
+            leftovers.append(r1)
+            used[i] = True
+
+    # ---------- Formatting ----------
     def format_root(r):
         rel_res = relative_residual(coeffs, r)
         real_str = mp.nstr(mp.re(r), digits)
@@ -207,16 +252,29 @@ def print_roots(coeffs, roots_mp):
         res_str = mp.nstr(rel_res, 6)
         return real_str, imag_str, mag_str, res_str
 
-    rows = [format_root(r) for r in roots_mp]
+    rows = []
 
-    # Determine column widths dynamically
-    w_real = max(len(r[0]) for r in rows) + 2
-    w_imag = max(len(r[1]) for r in rows) + 3
-    w_mag = max(len(r[2]) for r in rows) + 2
+    # --- Real roots first ---
+    for r in sorted(real_roots, key=lambda z: mp.re(z)):
+        rows.append(("real", format_root(r)))
+
+    # --- Complex conjugate pairs ---
+    for r1, r2 in pairs:
+        rows.append(("pair", format_root(r1)))
+        rows.append(("pair", format_root(r2)))
+
+    # --- Any leftovers (rare, non-conjugate numerical artifacts) ---
+    for r in leftovers:
+        rows.append(("complex", format_root(r)))
+
+    # ---------- Column widths ----------
+    w_real = max(len(r[1][0]) for r in rows) + 2
+    w_imag = max(len(r[1][1]) for r in rows) + 3
+    w_mag = max(len(r[1][2]) for r in rows) + 2
 
     total_width = 10 + w_real + w_imag + w_mag + 20
 
-    # Header
+    # ---------- Header ----------
     print("-" * total_width)
     print(
         f"{'Root #':<6} "
@@ -227,16 +285,17 @@ def print_roots(coeffs, roots_mp):
     )
     print("-" * total_width)
 
-    # Rows
-    for i, (real_str, imag_str, mag_str, res_str) in enumerate(rows, 1):
+    # ---------- Rows ----------
+    idx = 1
+    for kind, (real_str, imag_str, mag_str, res_str) in rows:
         print(
-            f"{i:<6d} "
+            f"{idx:<6d} "
             f"{real_str:>{w_real}} "
             f"{imag_str:>{w_imag}}j "
             f"{mag_str:>{w_mag}} "
             f"{res_str:>16}"
         )
-
+        idx += 1
 # ----------------------------- Combined Plot ----------------------------- #
 
 
@@ -281,8 +340,8 @@ def plot_combined(coeffs, roots_mp, equation):
     # ====================== POLYNOMIAL CURVE ======================
     # First, compute real roots (needed for insertion and markers)
     if roots_mp:
-        max_mag = max(abs(mp.re(r)) for r in roots_mp)
-        tol = mpf('1e-10') * max(mpf(1), max_mag)
+        # max_mag = max(abs(mp.re(r)) for r in roots_mp)
+        tol = root_tolerance(roots_mp)
         real_roots = [
             float(mp.re(r)) for r in roots_mp if abs(mp.im(r)) < tol
         ]
@@ -361,7 +420,7 @@ def plot_combined(coeffs, roots_mp, equation):
 # ----------------------------- Main ----------------------------- #
 
 
-def solve_and_plot(dps=100):
+def solve_and_plot(dps=400):
     mp.dps = dps
     print("\n--- Robust Companion Matrix Polynomial Solver ---")
     coeffs = get_coefficients()
