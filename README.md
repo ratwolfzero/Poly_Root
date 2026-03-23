@@ -228,6 +228,7 @@ Expected diagnostics: scaling, ill-conditioned matrix, clustered roots (exactly 
 $(x-1)^{10}$
     1 -10 45 -120 210 -252 210 -120 45 -10 1
 Remark: Compare default `dps=100`with `dps=200`!
+
 $(x-1)^{20}$
     1 -20 190 -1140 4845 -15504 38760 -77520 125970 -167960 184756 -167960 125970 -77520 38760 -15504 4845 -1140 190 -20 1
 Remark: Compare default `dps=100`with `dps=400`!
@@ -252,7 +253,9 @@ large-residual warning and **no** singular-matrix message.
 ### 7. Large dynamic range / extreme scaling
 
     1 0 0 0 0 100000000000000000000
+
     1 0 -1000101 0 101000100 0 -100000000
+    
     524288 0 -2621440 0 +5570560 0 -6553600 0 +4845120 0 -2325120 0 +715400 0 -133760 0 +14400 0 -800 0 1
 
 ---
