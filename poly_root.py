@@ -53,9 +53,11 @@ def companion_diagnostics(C):
     if cond_number == mp.inf:
         print("WARNING: Companion matrix is singular or numerically unstable.")
     elif cond_number > 1e12:
-        print(f"WARNING: Ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
+        print(
+            f"WARNING: Ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
     elif cond_number > 1e6:
-        print(f"NOTICE: Moderately ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
+        print(
+            f"NOTICE: Moderately ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
     return cond_number
 
 
@@ -169,7 +171,8 @@ def compute_roots(coeffs):
         # Pure power of x → all roots are zero
         roots_mp = [mpc(0)] * zero_multiplicity
     else:
-        C, linear_root = build_companion(reduced_coeffs)   # constant term now != 0
+        C, linear_root = build_companion(
+            reduced_coeffs)   # constant term now != 0
         if linear_root is not None:
             reduced_roots = [mpc(linear_root[0])]
         else:
@@ -197,7 +200,8 @@ def compute_roots(coeffs):
     if detect_clusters(roots_mp):
         print("NOTICE: Clustered roots detected → high sensitivity likely.")
 
-    roots_mp.sort(key=lambda z: (mp.re(z), abs(z), mp.atan2(mp.im(z), mp.re(z))))
+    roots_mp.sort(key=lambda z: (mp.re(z), abs(z),
+                  mp.atan2(mp.im(z), mp.re(z))))
     return roots_mp
 
 # ----------------------------- Display ----------------------------- #
