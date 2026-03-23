@@ -44,12 +44,7 @@ def coefficient_diagnostics(coeffs):
             f"NOTICE: Large coefficient scaling (ratio ≈ {mp.nstr(ratio, 4)})")
 
 
-def companion_diagnostics(C, structural_singular=False):
-    # Skip meaningless condition number if singular by construction
-    if structural_singular:
-        print("INFO: Companion matrix is singular by construction (numerically safe).")
-        return None
-
+def companion_diagnostics(C):
     try:
         cond_number = mp.norm(C, 1) * mp.norm(C**-1, 1)
     except Exception:
@@ -58,12 +53,9 @@ def companion_diagnostics(C, structural_singular=False):
     if cond_number == mp.inf:
         print("WARNING: Companion matrix is singular or numerically unstable.")
     elif cond_number > 1e12:
-        print(
-            f"WARNING: Ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
+        print(f"WARNING: Ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
     elif cond_number > 1e6:
-        print(
-            f"NOTICE: Moderately ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
-
+        print(f"NOTICE: Moderately ill-conditioned matrix (cond ≈ {mp.nstr(cond_number, 4)})")
     return cond_number
 
 
@@ -145,25 +137,17 @@ def build_companion(coeffs):
     if leading == 0:
         raise ZeroDivisionError("Leading coefficient cannot be zero.")
 
-    has_zero_root = (coeffs[-1] == 0)
-
-    if has_zero_root:
-        print("NOTICE: Polynomial has root at x = 0")
-
     a = [c / leading for c in coeffs[1:]]
     n = len(a)
-
     if n == 1:
-        return None, [-a[0]], has_zero_root
+        return None, [-a[0]]          # linear root case, 2-tuple now
 
     C = matrix(n)
     for row in range(1, n):
         C[row, row - 1] = mpf(1)
-
     for row in range(n):
         C[row, n - 1] = -a[n - 1 - row]
-
-    return C, None, has_zero_root
+    return C, None                    # 2-tuple
 
 # ----------------------------- Root Computation ----------------------------- #
 
@@ -171,27 +155,41 @@ def build_companion(coeffs):
 def compute_roots(coeffs):
     coefficient_diagnostics(coeffs)
 
-    C, linear_root, has_zero_root = build_companion(coeffs)
+    # === DEFLATE EXACT ZERO ROOTS (handles multiplicity) ===
+    zero_multiplicity = 0
+    reduced_coeffs = list(coeffs)
+    while len(reduced_coeffs) > 1 and reduced_coeffs[-1] == 0:
+        reduced_coeffs.pop()
+        zero_multiplicity += 1
 
-    if linear_root is not None:
-        roots_mp = [mpc(linear_root[0])]
+    if zero_multiplicity > 0:
+        print(f"NOTICE: Polynomial has {zero_multiplicity} root(s) at x = 0")
+
+    if len(reduced_coeffs) == 1:
+        # Pure power of x → all roots are zero
+        roots_mp = [mpc(0)] * zero_multiplicity
     else:
-        companion_diagnostics(C, structural_singular=has_zero_root)
-        try:
-            eigenvalues = eig(C, left=False, right=False)
-            roots_mp = [mpc(ev) for ev in eigenvalues]
-        except Exception as e:
-            print("ERROR: Eigenvalue computation failed.")
-            print("Likely due to extreme ill-conditioning.")
-            print(f"{type(e).__name__}: {e}")
-            return []
+        C, linear_root = build_companion(reduced_coeffs)   # constant term now != 0
+        if linear_root is not None:
+            reduced_roots = [mpc(linear_root[0])]
+        else:
+            companion_diagnostics(C)
+            try:
+                eigenvalues = eig(C, left=False, right=False)
+                reduced_roots = [mpc(ev) for ev in eigenvalues]
+            except Exception as e:
+                print("ERROR: Eigenvalue computation failed.")
+                print(f"{type(e).__name__}: {e}")
+                return []
 
+        roots_mp = [mpc(0)] * zero_multiplicity + reduced_roots
+
+    # --- the rest of the function stays exactly the same ---
     abs_residuals = [abs(poly_eval(coeffs, r)) for r in roots_mp]
     rel_residuals = [relative_residual(coeffs, r) for r in roots_mp]
 
     if max(abs_residuals, default=0) > 1:
         print("WARNING: Large absolute residuals")
-
     expected_res = mpf(10) ** (-mp.dps // 2 + 5)
     if max(rel_residuals, default=0) > expected_res:
         print(f"WARNING: Large relative residuals (expected ~1e{-mp.dps//2})")
@@ -199,12 +197,7 @@ def compute_roots(coeffs):
     if detect_clusters(roots_mp):
         print("NOTICE: Clustered roots detected → high sensitivity likely.")
 
-    roots_mp.sort(key=lambda z: (
-        mp.re(z),
-        abs(z),
-        mp.atan2(mp.im(z), mp.re(z))
-    ))
-
+    roots_mp.sort(key=lambda z: (mp.re(z), abs(z), mp.atan2(mp.im(z), mp.re(z))))
     return roots_mp
 
 # ----------------------------- Display ----------------------------- #
