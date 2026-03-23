@@ -298,49 +298,36 @@ def print_roots(coeffs, roots_mp):
         idx += 1
 # ----------------------------- Combined Plot ----------------------------- #
 
-
-def plot_combined(coeffs, roots_mp, equation):
-    if not roots_mp:
-        return
-
+def plot_complex_plane(ax, roots_mp):
     roots_np = np.array([
         complex(float(mp.re(z)), float(mp.im(z)))
         for z in roots_mp
     ])
 
-    fig, (ax1, ax2) = plt.subplots(
-        1, 2, figsize=(24, 7),
-        gridspec_kw={'width_ratios': [1, 1.5]}
-    )
-    fig.canvas.manager.set_window_title(
-        f"Complex Plane and Polynomial Curve")
-    fig.suptitle(f"Polynomial: {equation}", wrap=True)
-
-    # ====================== COMPLEX PLANE ======================
-    ax1.axhline(0, lw=1)
-    ax1.axvline(0, lw=1)
-    ax1.scatter(roots_np.real, roots_np.imag, color="red",
+    ax.axhline(0, lw=1)
+    ax.axvline(0, lw=1)
+    ax.scatter(roots_np.real, roots_np.imag, color="red",
                 s=10, zorder=5, label="Roots")
     t = np.linspace(0, 2*np.pi, 200)
-    ax1.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5,
+    ax.plot(np.cos(t), np.sin(t), ls="--", alpha=0.5,
              color="gray", label="Unit Circle")
 
     max_modulus = np.max(np.abs(roots_np)) if roots_np.size > 0 else 0
     view_radius = 1.1 * max(max_modulus, 1.0)
 
-    ax1.set_xlim(-view_radius, view_radius)
-    ax1.set_ylim(-view_radius, view_radius)
-    ax1.set_aspect('equal', adjustable='box')
-    ax1.set_title("Roots in Complex Plane")
-    ax1.set_xlabel("Real")
-    ax1.set_ylabel("Imaginary")
-    ax1.legend(loc="best")
-    ax1.grid(True, linestyle=":", alpha=0.6)
+    ax.set_xlim(-view_radius, view_radius)
+    ax.set_ylim(-view_radius, view_radius)
+    ax.set_aspect('equal', adjustable='box')
+    ax.set_title("Roots in Complex Plane")
+    ax.set_xlabel("Real")
+    ax.set_ylabel("Imaginary")
+    ax.legend(loc="best")
+    ax.grid(True, linestyle=":", alpha=0.6)
 
-    # ====================== POLYNOMIAL CURVE ======================
+
+def plot_polynomial_curve(ax, coeffs, roots_mp):
     # First, compute real roots (needed for insertion and markers)
     if roots_mp:
-        # max_mag = max(abs(mp.re(r)) for r in roots_mp)
         tol = root_tolerance(roots_mp)
         real_roots = [
             float(mp.re(r)) for r in roots_mp if abs(mp.im(r)) < tol
@@ -377,43 +364,63 @@ def plot_combined(coeffs, roots_mp, equation):
         max_abs = 1e300
 
     # Plot curve and markers
-    ax2.plot(x_vals, y_vals, lw=1, label=f"p(x)")
-    ax2.axhline(0, lw=1)
-    ax2.axvline(0, lw=1)
+    ax.plot(x_vals, y_vals, lw=1, label=f"p(x)")
+    ax.axhline(0, lw=1)
+    ax.axvline(0, lw=1)
 
     if real_roots:
-        ax2.scatter(real_roots, [0]*len(real_roots),
+        ax.scatter(real_roots, [0]*len(real_roots),
                     color="blue", s=10, zorder=5, label="Real Roots")
 
     # Initial scale setting
     if max_abs > 1e6:
         linthresh = 1.0
-        ax2.set_yscale('symlog', linthresh=linthresh, linscale=1.0)
+        ax.set_yscale('symlog', linthresh=linthresh, linscale=1.0)
         print(f"NOTICE: symlog y-scale activated (linthresh = {linthresh})")
     else:
-        ax2.set_ylim(-max_abs * 1.05, max_abs * 1.05)
+        ax.set_ylim(-max_abs * 1.05, max_abs * 1.05)
 
-    ax2.set_title("Polynomial Curve and Roots in Real Domain")
-    ax2.set_xlabel("x")
-    ax2.set_ylabel("$f(x)$")
-    ax2.legend(loc="best")
-    ax2.grid(True, linestyle=":", alpha=0.7)
+    ax.set_title("Polynomial Curve and Roots in Real Domain")
+    ax.set_xlabel("x")
+    ax.set_ylabel("$f(x)$")
+    ax.legend(loc="best")
+    ax.grid(True, linestyle=":", alpha=0.7)
 
-    plt.subplots_adjust(top=0.85)
+    return max_abs
 
-    # ---------- Interactive scale toggle ----------
+
+def add_interactive_scale(fig, ax, max_abs):
     def on_key(event):
         if event.key == 'l':
-            ax2.set_yscale('linear')
-            ax2.set_ylim(-max_abs * 1.05, max_abs * 1.05)
+            ax.set_yscale('linear')
+            ax.set_ylim(-max_abs * 1.05, max_abs * 1.05)
             fig.canvas.draw_idle()
             print("Switched to linear scale")
         elif event.key == 'y':
-            ax2.set_yscale('symlog', linthresh=1.0, linscale=1.0)
+            ax.set_yscale('symlog', linthresh=1.0, linscale=1.0)
             fig.canvas.draw_idle()
             print("Switched to symlog scale")
     fig.canvas.mpl_connect('key_press_event', on_key)
-    # ----------------------------------------------
+
+
+def plot_combined(coeffs, roots_mp, equation):
+    if not roots_mp:
+        return
+
+    fig, (ax1, ax2) = plt.subplots(
+        1, 2, figsize=(24, 7),
+        gridspec_kw={'width_ratios': [1, 1.5]}
+    )
+    fig.canvas.manager.set_window_title(
+        f"Complex Plane and Polynomial Curve")
+    fig.suptitle(f"Polynomial: {equation}", wrap=True)
+
+    plot_complex_plane(ax1, roots_mp)
+    max_abs = plot_polynomial_curve(ax2, coeffs, roots_mp)
+
+    plt.subplots_adjust(top=0.85)
+
+    add_interactive_scale(fig, ax2, max_abs)
 
     plt.show()
 
