@@ -129,6 +129,9 @@ Equation:
     9        1.0    -1.39469e-10j   1.0     6.64146e-102
     10       1.0     +1.0029e-10j   1.0     6.01245e-102
 
+If you increase the precison form Default: `mp.dps = 100` to `mp.dps = 400`
+The cluster shrinks all imaginary part will be < tol and "snapped" to zero
+
 **Important:**  
 No artificial numerical stabilization is applied:
 
