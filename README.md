@@ -148,7 +148,9 @@ but not necessarily accurate roots for ill-conditioned problems.
 Example input:
 
    1 0 -4 --> x^2 - 4 = 0
+
    1 1 4  --> x^2 + x + 4 = 0
+
    1 1 0  --> x^2 + x = 0
 
 Outputs:
