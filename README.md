@@ -77,13 +77,12 @@ Degree-1 polynomials are solved directly (no matrix construction).
 
 ### Display Normalization (cosmetic only)
 
-### Display Normalization (cosmetic only)
 Tiny imaginary parts (below the **relative tolerance** `tol = 10^{-10} × max(1, max|r|)` ) are snapped to zero **for readability only**.  
 This primarily removes numerical noise from theoretically real roots, but may also suppress very small imaginary components in near-real roots.
 
 **Example: High-multiplicity root behaviour**  
 For polynomials with high-multiplicity roots such as $(x-1)^{10}$, all roots are theoretically real and identical.  
-In finite-precision computation the multiple root splits into a small cluster because of the intrinsic ill-conditioning: 
+In finite-precision computation the multiple root splits into a small cluster because of the intrinsic ill-conditioning:
 
 $$
 |\Delta x| \sim |\Delta a|^{1/m}
@@ -96,7 +95,7 @@ with $m=10$. Some roots acquire tiny imaginary parts while others remain real.
 - At the default `mp.dps = 100` the cluster size is on the order of \(10^{-10}\), so a few roots still show imaginary parts slightly **above** the snapping tolerance (see output below).  
 - Increasing to `mp.dps = 400` reduces the rounding-induced perturbation dramatically; the entire cluster shrinks well **below** the tolerance \(10^{-10}\), so **all** imaginary parts are snapped to zero in the printed table.
 
-    --- Robust Companion Matrix Polynomial Solver ---
+--- Robust Companion Matrix Polynomial Solver ---  
 Coefficients (space separated): 1 -10 45 -120 210 -252 210 -120 45 -10 1  
 NOTICE: Moderately ill-conditioned matrix (cond ≈ 1.065e+6)  
 NOTICE: Clustered roots detected → high sensitivity likely.
