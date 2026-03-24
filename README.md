@@ -77,33 +77,24 @@ Degree-1 polynomials are solved directly (no matrix construction).
 
 ### Display Normalization (cosmetic only)
 
-Tiny imaginary parts (below a relative tolerance) are set to zero for readability.
+### Display Normalization (cosmetic only)
+Tiny imaginary parts (below the **relative tolerance** `tol = 10^{-10} × max(1, max|r|)` ) are snapped to zero **for readability only**.  
 This primarily removes numerical noise from theoretically real roots, but may also suppress very small imaginary components in near-real roots.
 
-Example: High-Multiplicity Root Behaviour
-For polynomials with high-multiplicity roots, such as:
-
-$(x-1)^{10}$
-
-all roots are theoretically real and identical.
-However, in numerical computation:
-the multiple root typically splits into a cluster of nearby roots
-some roots may acquire small imaginary parts
-others may remain real after display normalization
-This behavior is not a numerical bug, but a consequence of:
-intrinsic ill-conditioning of multiple roots
-sensitivity described by:
+**Example: High-multiplicity root behaviour**  
+For polynomials with high-multiplicity roots such as $(x-1)^{10}$, all roots are theoretically real and identical.  
+In finite-precision computation the multiple root splits into a small cluster because of the intrinsic ill-conditioning: 
 
 $$
 |\Delta x| \sim |\Delta a|^{1/m}
 $$
 
-Effect of Precision
-Increasing precision:
-reduces random rounding noise
-shrinks the cluster
-but does not eliminate the root splitting
-This provides a direct visualization of the instability of multiple roots.
+with $m=10$. Some roots acquire tiny imaginary parts while others remain real.
+
+**Effect of precision**  
+
+- At the default `mp.dps = 100` the cluster size is on the order of \(10^{-10}\), so a few roots still show imaginary parts slightly **above** the snapping tolerance (see output below).  
+- Increasing to `mp.dps = 400` reduces the rounding-induced perturbation dramatically; the entire cluster shrinks well **below** the tolerance \(10^{-10}\), so **all** imaginary parts are snapped to zero in the printed table.
 
     --- Robust Companion Matrix Polynomial Solver ---
 Coefficients (space separated): 1 -10 45 -120 210 -252 210 -120 45 -10 1  
@@ -128,9 +119,6 @@ Equation:
     8        1.0    +1.48179e-10j   1.0     6.12143e-102
     9        1.0    -1.39469e-10j   1.0     6.64146e-102
     10       1.0     +1.0029e-10j   1.0     6.01245e-102
-
-If you increase the precison form Default: `mp.dps = 100` to `mp.dps = 400`
-The cluster shrinks all imaginary part will be < tol and "snapped" to zero
 
 **Important:**  
 No artificial numerical stabilization is applied:
