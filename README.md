@@ -106,12 +106,12 @@ but does not eliminate the root splitting
 This provides a direct visualization of the instability of multiple roots.
 
     --- Robust Companion Matrix Polynomial Solver ---
-Coefficients (space separated): 1 -10 45 -120 210 -252 210 -120 45 -10 1
-NOTICE: Moderately ill-conditioned matrix (cond ≈ 1.065e+6)
+Coefficients (space separated): 1 -10 45 -120 210 -252 210 -120 45 -10 1.
+NOTICE: Moderately ill-conditioned matrix (cond ≈ 1.065e+6)  
 NOTICE: Clustered roots detected → high sensitivity likely.
 
 Polynomial Degree: 10
-Equation: 
+Equation:
     x^10 - 10x^9 + 45x^8 - 120x^7 + 210x^6 - 252x^5 + 210x^4 - 120x^3 + 45x^2 - 10x + 1 = 0
 
 ---
