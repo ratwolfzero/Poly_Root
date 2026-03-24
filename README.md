@@ -80,6 +80,56 @@ Degree-1 polynomials are solved directly (no matrix construction).
 Tiny imaginary parts (below a relative tolerance) are set to zero for readability.
 This primarily removes numerical noise from theoretically real roots, but may also suppress very small imaginary components in near-real roots.
 
+Example: High-Multiplicity Root Behaviour
+For polynomials with high-multiplicity roots, such as:
+
+$(x-1)^{10}$
+
+    --- Robust Companion Matrix Polynomial Solver ---
+Coefficients (space separated): 1 -10 45 -120 210 -252 210 -120 45 -10 1
+NOTICE: Moderately ill-conditioned matrix (cond ≈ 1.065e+6)
+NOTICE: Clustered roots detected → high sensitivity likely.
+
+Polynomial Degree: 10
+Equation: x^10 - 10x^9 + 45x^8 - 120x^7 + 210x^6 - 252x^5 + 210x^4 - 120x^3 + 45x^2 - 10x + 1 = 0
+
+---
+
+Root #  Real       Imaginary   |z|     Rel.Residual
+
+---
+
+1        1.0            +0.0j   1.0     6.13212e-102
+2        1.0            +0.0j   1.0     2.23937e-102
+3        1.0            +0.0j   1.0     1.31851e-102
+4        1.0            +0.0j   1.0     4.97406e-102
+5        1.0     -1.0029e-10j   1.0      6.9069e-102
+6        1.0    +1.39469e-10j   1.0     6.31195e-102
+7        1.0    -1.48179e-10j   1.0     6.14457e-102
+8        1.0    +1.48179e-10j   1.0     6.12143e-102
+9        1.0    -1.39469e-10j   1.0     6.64146e-102
+10       1.0     +1.0029e-10j   1.0     6.01245e-102
+
+all roots are theoretically real and identical.
+However, in numerical computation:
+the multiple root typically splits into a cluster of nearby roots
+some roots may acquire small imaginary parts
+others may remain real after display normalization
+This behavior is not a numerical bug, but a consequence of:
+intrinsic ill-conditioning of multiple roots
+sensitivity described by:
+
+$$
+|\Delta x| \sim |\Delta a|^{1/m}
+$$
+
+Effect of Precision
+Increasing precision:
+reduces random rounding noise
+shrinks the cluster
+but does not eliminate the root splitting
+This provides a direct visualization of the instability of multiple roots.
+
 **Important:**  
 No artificial numerical stabilization is applied:
 
