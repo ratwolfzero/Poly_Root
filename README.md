@@ -14,7 +14,7 @@ computed roots more reliable.
 
 ---
 
-## §§ 1. Mathematical Background §§
+## 1. Mathematical Background
 
 Polynomial root-finding is sensitive to both:
 
@@ -40,7 +40,7 @@ $$
 
 ---
 
-## §§ 2. Methodology §§
+## 2. Methodology
 
 ### Normalization
 
@@ -89,7 +89,7 @@ No artificial numerical stabilization is applied:
 
 ---
 
-## §§ 3. Diagnostics §§
+## 3. Diagnostics
 
 The solver reports issues without fixing them.
 
@@ -121,7 +121,7 @@ $$
 
 ---
 
-## §§ 4. Residual Definition §§
+## 4. Residual Definition
 
 $$
 \frac{|P(r)|}{\sum |a_i| \cdot |r|^{n-i}}
@@ -132,7 +132,7 @@ but not necessarily accurate roots for ill-conditioned problems.
 
 ---
 
-## §§ 5. Features §§
+## 5. Features
 
 - Arbitrary precision (configurable)
 - Exact zero-root handling
@@ -143,7 +143,7 @@ but not necessarily accurate roots for ill-conditioned problems.
 
 ---
 
-## §§ 6. Usage §§
+## 6. Usage
 
 Example input:
 
@@ -158,7 +158,7 @@ Outputs:
 
 ---
 
-## §§ 7. Interpretation §§
+## 7. Interpretation
 
 - Small residual → numerically consistent root
 - Warnings → structural/numerical difficulty
@@ -167,7 +167,7 @@ Outputs:
 
 ---
 
-## §§ 8. Test Cases §§
+## 8. Test Cases
 
 - Wilkinson polynomial
 - Multiple roots: (x-1)^10, (x-1)^20
@@ -230,7 +230,7 @@ large-residual warning and **no** singular-matrix message.
 
 ---
 
-## §§ Key Idea §§
+## Key Idea
 
 The solver does **not solve the conditioning problem**.
 
@@ -242,6 +242,6 @@ It instead provides:
 
 ---
 
-## §§ Further Reading §§
+## Further Reading
 
 <https://medium.com/@ratwolf/the-floating-point-catastrophe-9e795d46cfb1>
