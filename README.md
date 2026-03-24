@@ -3,91 +3,55 @@
 A robust polynomial solver leveraging **arbitrary-precision
 floating-point arithmetic** to compute roots of ill-conditioned
 polynomials.
-This tool primarily addresses **rounding and
-finite-precision issues** present in standard 64-bit floating-point
-implementations by constructing and solving a companion matrix within
-the `mpmath` environment.
-The solver **cannot eliminate the intrinsic mathematical
-ill-conditioning** of certain polynomials, but it can **significantly
-reduce the numerical errors caused by rounding**, making the computed
-roots far more reliable.
-It features **modular code structure**, **residual checks**, and
-**robust input validation** to improve usability and reliability
+
+This tool primarily addresses **rounding and finite-precision issues**
+present in standard 64-bit floating-point implementations by constructing
+and solving a companion matrix within the `mpmath` environment.
+
+The solver **cannot eliminate intrinsic mathematical ill-conditioning**,
+but it can **significantly reduce numerical rounding errors**, making the
+computed roots more reliable.
 
 ---
 
-## 1. The Mathematical Background
+## §§ 1. Mathematical Background §§
 
-Polynomial root-finding algorithms are sensitive to both the **intrinsic
-conditioning of the polynomial** and the **finite precision of
-arithmetic**. The mapping from coefficients to roots can be extremely
-sensitive to perturbations, a phenomenon illustrated by **Wilkinson's
-example**.
-For a polynomial
+Polynomial root-finding is sensitive to both:
+
+- intrinsic conditioning
+- finite precision arithmetic
+
+Given:
 
 $$
 P(x) = a_n x^n + a_{n-1} x^{n-1} + \dots + a_1 x + a_0
 $$
 
-small changes in coefficients may produce large changes in the roots.
-This sensitivity is an inherent mathematical property and **cannot be
-fully eliminated by any algorithm**.
-However, many practical errors arise from **floating-point rounding
-limitations** in standard numerical implementations. By using
-**arbitrary precision arithmetic**, this solver reduces these rounding
-effects and therefore improves the stability of the computed roots.
+Small coefficient perturbations can produce large root changes
+(**Wilkinson's phenomenon**).
 
-As a classic illustration, the Wilkinson Polynomial ($n = 20$) shows
-that even extremely small perturbations (for example modifying the
-$x^{19}$ coefficient by $2^{-23}$) can shift real roots into the complex
-plane.
+### Multiple Roots
 
-### Multiple Roots and Sensitivity
-
-Polynomials containing **multiple roots** are particularly
-ill-conditioned. Near a root of multiplicity $m$, small perturbations in
-coefficients can produce root shifts approximately proportional to
+Near a root of multiplicity $m$:
 
 $$
 |\Delta x| \sim |\Delta a|^{1/m}
 $$
 
-This means even extremely small coefficient perturbations may split a
-multiple root into a cluster of nearby roots.
-High‑precision arithmetic helps ensure that such behavior reflects the
-**true mathematical sensitivity of the polynomial**, rather than
-artificial numerical noise
-
 ---
 
-## 2. Methodology
-
-Instead of relying on iterative root‑polishing techniques such as
-Newton--Raphson or specialized polynomial solvers like Jenkins--Traub,
-this solver computes all roots simultaneously using the **Companion
-Matrix Eigenvalue Method**.
+## §§ 2. Methodology §§
 
 ### Normalization
 
-The polynomial is converted to monic form by dividing all coefficients
-by the leading coefficient.
+Polynomial is converted to monic form.
 
-### Exact Zero-Root Deflation (Algebraic Preprocessing)
+### Exact Zero-Root Deflation
 
-If the constant term is exactly zero, the polynomial has one or more
-roots at `x = 0`. These roots are **factored out exactly** by removing
-all trailing zero coefficients before the companion matrix is built.
-The zero roots are inserted back with perfect precision (residual = 0).
-This step is **purely algebraic** — no floating-point arithmetic is
-involved — and prevents the construction of a structurally singular
-companion matrix. After deflation the remaining polynomial always has
-a non-zero constant term.
+Trailing zero coefficients are removed **purely algebraically**.
+Zero roots are reinserted exactly.
 
-### Matrix Construction
-
-A companion matrix $C$ is constructed for the **deflated**
-monic polynomial such that its characteristic polynomial corresponds
-exactly to the reduced polynomial:
+### Companion Matrix
 
 $$
 C =
@@ -100,122 +64,116 @@ C =
 \end{pmatrix}
 $$
 
-The eigenvalues of this matrix correspond to the **roots of the
-polynomial**.
+Eigenvalues correspond to polynomial roots.
 
-### High‑Precision Eigenvalue Solve
+### High-Precision Eigenvalue Solve
 
-The eigenvalues of the companion matrix are computed using `mpmath.eig`,
-which operates with arbitrary precision.
-By default
-    mp.dps = 100
-This provides **100 decimal digits of working precision**, which
-significantly reduces rounding errors compared to standard double
-precision.
-Increasing `mp.dps` increases the precision used during both the
-eigenvalue computation and polynomial evaluation.
+- Uses `mpmath.eig`
+- Default: `mp.dps = 100`
+
+### Linear Case
+
+Degree-1 polynomials are solved directly (no matrix construction).
 
 ### Display Normalization (cosmetic only)
 
-Theoretically real roots are sometimes returned by `mpmath.eig` with a tiny imaginary part (~10^{-100} or smaller) due to rounding in the QR algorithm. For human-readable output these imaginary parts are snapped to exactly zero. This step is **purely cosmetic** and does not affect the computed roots, the residuals used for warnings, or any internal calculation.
+Tiny imaginary parts are set to zero for readability only.
 
-**Important (non-artificial approach):** The solver uses the **raw,
-unmodified companion matrix** *(after exact algebraic deflation of any
-roots at zero)* with **no artificial improvements** whatsoever — no
-balancing, no scaling, no root polishing, **no further deflation**,
-no Wilkinson's shift, and no cluster handling. All numerical
-difficulties are reported transparently via diagnostics (see section 3).
+**Important:**  
+No artificial numerical stabilization is applied:
 
-### Residual Verification
+- no balancing
+- no scaling
+- no polishing
+- no deflation (except exact zero roots)
 
-Each computed root $r$ is validated by computing the **relative residual**
+---
+
+## §§ 3. Diagnostics §§
+
+The solver reports issues without fixing them.
+
+### Coefficient Scaling
+
+- NOTICE: ratio > 1e6
+- WARNING: ratio > 1e12
+
+### Matrix Conditioning (approximate indicator)
+
+- NOTICE: cond > 1e6
+- WARNING: cond > 1e12
+
+### Cluster Detection
+
+Roots closer than:
+
+$$
+10^{-8} \cdot \max(|r|, 1)
+$$
+
+### Residual Warnings
+
+Expected scale:
+
+$$
+10^{-\frac{\text{dps}}{2} + 5}
+$$
+
+---
+
+## §§ 4. Residual Definition §§
 
 $$
 \frac{|P(r)|}{\sum |a_i| \cdot |r|^{n-i}}
 $$
 
-This measures **how well the computed value satisfies the polynomial
-equation relative to its magnitude**. Residuals are displayed for every
-root
+Small residuals indicate numerical consistency,
+but not necessarily accurate roots for ill-conditioned problems.
 
 ---
 
-## 3. Diagnostics (the "non-artificial but diagnostic" approach)
+## §§ 5. Features §§
 
-The solver **never hides or fixes** ill-conditioning. Instead it prints
-clear diagnostics exactly when they occur:
-
-- **Coefficient scaling** — ratio max/min > 10⁶ (NOTICE) or > 10¹² (WARNING)
-- **Companion matrix conditioning** — 1-norm condition number > 10⁶ (NOTICE) or > 10¹² (WARNING)
-- **Clustered roots** — groups closer than 10⁻⁸ × |root| (NOTICE)
-- **Large residuals** — absolute or relative residuals exceeding the working-precision expectation (WARNING)
-
-This philosophy guarantees you see the **true behaviour** of the raw
-companion-matrix method on ill-conditioned polynomials.
+- Arbitrary precision (configurable)
+- Exact zero-root handling
+- Companion matrix eigenvalue method
+- Transparent diagnostics
+- Relative residual verification
+- Visualization (complex plane + real domain)
 
 ---
 
-## 4. Features
+## §§ 6. Usage §§
 
-- **Arbitrary Precision:** Default 100 decimal places (configurable)
-- **Improved Numerical Stability:** Mitigates rounding errors common
-    in double‑precision implementations
-- **Modular Structure:** Separate functions for input, matrix
-    construction, eigenvalue computation, evaluation, printing, and
-    plotting
-- **Robust Input Handling:** Re‑prompts until valid space‑separated
-    numeric coefficients are entered
-- **Transparent Diagnostics:** Prints every warning/notice exactly as
-    the raw method encounters it
-- **Relative Residual Verification:** Displays relative residual for each root
-- **Combined Visualization:** Roots plotted in the complex plane
-**plus** the polynomial curve on the real line (with automatic
-    symlog scaling for huge dynamic ranges)
+Example input:
+
+   1 0 -4
+
+Outputs:
+
+- diagnostics
+- polynomial equation
+- roots with residuals
+- plots
 
 ---
 
-## 5. Usage
+## §§ 7. Interpretation §§
 
-Run the script and enter the coefficients separated by spaces.
-Example input
-    Coefficients (space separated): 1 0 -4
-The program outputs
-
-- All diagnostics (scaling, conditioning, clusters, residuals)
-- Polynomial degree
-- Polynomial equation string
-- Computed roots with relative residuals
-- A combined plot (complex plane + real-domain curve) --> use the "l" and "y" key to toggle between linear and symlog scale
+- Small residual → numerically consistent root
+- Warnings → structural/numerical difficulty
+- Clusters → high sensitivity
+- Conditioning → approximate matrix indicator (not eigenvalue sensitivity)
 
 ---
 
-## 6. Interpreting Residuals
+## §§ 8. Test Cases §§
 
-The displayed value is the **relative residual**. With
-    mp.dps = 100
-typical values lie far below the warning threshold of roughly
-
-$$
-10^{-45}
-$$
-
-A very small relative residual indicates that the computed root satisfies
-the polynomial equation to near machine precision. However, this **does
-not guarantee high root accuracy** in cases where the polynomial is
-intrinsically ill-conditioned, such as for multiple roots or highly
-sensitive coefficient-to-root mappings.
-Diagnostics (such as conditioning warnings or singular companion
-matrices) describe the numerical difficulty of the **companion matrix
-eigenvalue problem**, not directly the accuracy of the computed roots.
-Therefore, it is entirely possible to observe warnings while still
-obtaining highly accurate roots, provided the relative residuals remain
-very small. Conversely, small residuals should always be interpreted in
-the context of the reported diagnostics, especially for ill-conditioned
-problems.
-
----
-
-## 7. Test Cases & Stress Tests
+- Wilkinson polynomial
+- Multiple roots: (x-1)^10, (x-1)^20
+- Complex multiplicity: (x^2 + 1)^5
+- Zero-root cases
+- Extreme scaling cases
 
 ### 1. Classic Wilkinson Polynomial (distinct roots 1–20)
 
@@ -272,18 +230,18 @@ large-residual warning and **no** singular-matrix message.
 
 ---
 
-## Key Idea
+## §§ Key Idea §§
 
-The solver does **not attempt to solve the fundamental conditioning
-problem of polynomial root finding**.
-Instead, it focuses on **reducing numerical rounding errors** using
-high‑precision arithmetic **while deliberately applying zero artificial
-stabilizations**. The diagnostics let you see the raw, unfiltered
-behaviour of the companion-matrix method.
+The solver does **not solve the conditioning problem**.
+
+It instead provides:
+
+- high precision arithmetic
+- raw companion matrix method
+- full numerical transparency
 
 ---
 
-## Further Reading
+## §§ Further Reading §§
 
-Medium article:
 <https://medium.com/@ratwolf/the-floating-point-catastrophe-9e795d46cfb1>
