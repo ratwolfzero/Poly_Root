@@ -77,7 +77,8 @@ Degree-1 polynomials are solved directly (no matrix construction).
 
 ### Display Normalization (cosmetic only)
 
-Tiny imaginary parts are set to zero for readability only.
+Tiny imaginary parts (below a relative tolerance) are set to zero for readability.
+This primarily removes numerical noise from theoretically real roots, but may also suppress very small imaginary components in near-real roots.
 
 **Important:**  
 No artificial numerical stabilization is applied:
