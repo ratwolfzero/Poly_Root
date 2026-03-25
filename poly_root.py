@@ -345,29 +345,35 @@ def plot_polynomial_curve(ax, coeffs, roots_mp):
         real_roots = [
             float(mp.re(r)) for r in roots_mp if abs(mp.im(r)) < tol
         ]
+        real_parts = [float(mp.re(r)) for r in roots_mp]
     else:
         real_roots = []
+        real_parts = []
 
-    # Build x values including real roots
-    real_parts = [float(mp.re(r)) for r in roots_mp]
-    spread = max(real_parts) - min(real_parts) if real_parts else 1.0
-    x_center = sum(real_parts) / len(real_parts) if real_parts else 0.0
-    x_pad = 1.5 * max(spread, 1.0)
+    # ------------------- NEW: TIGHT ROOT-BASED RANGE ------------------- #
+    if real_parts:
+        xmin = min(real_parts) - 1.0
+        xmax = max(real_parts) + 1.0
+    else:
+        xmin, xmax = -5.0, 5.0
 
-    # Initial sampling (use 2000 for speed; increase if needed)
-    x_vals_initial = np.linspace(x_center - x_pad, x_center + x_pad, 2000)
+    # Generate x values
+    x_vals_initial = np.linspace(xmin, xmax, 2000)
 
-    # Insert each real root (if not already present)
+    # Insert real roots explicitly (ensures exact zero crossings appear)
     x_list = x_vals_initial.tolist()
     for root in real_roots:
         if not any(abs(root - x) < 1e-12 for x in x_list):
             x_list.append(root)
+
     x_list.sort()
     x_vals = np.array(x_list)
 
     # Evaluate polynomial at each x (high precision)
-    y_vals = np.array([float(mp.re(poly_eval(coeffs, mpf(xx))))
-                      for xx in x_vals])
+    y_vals = np.array([
+        float(mp.re(poly_eval(coeffs, mpf(xx))))
+        for xx in x_vals
+    ])
 
     # Prevent overflow
     max_abs = np.max(np.abs(y_vals)) if len(y_vals) > 0 else 1.0
@@ -376,22 +382,19 @@ def plot_polynomial_curve(ax, coeffs, roots_mp):
         y_vals = np.clip(y_vals, -1e300, 1e300)
         max_abs = 1e300
 
-    # Plot curve and markers
-    ax.plot(x_vals, y_vals, lw=1, label=f"p(x)")
+    # Plot curve
+    ax.plot(x_vals, y_vals, lw=1, label="p(x)")
     ax.axhline(0, lw=1)
     ax.axvline(0, lw=1)
 
+    # Plot real roots
     if real_roots:
         ax.scatter(real_roots, [0]*len(real_roots),
                    color="blue", s=10, zorder=5, label="Real Roots")
 
-    # Initial scale setting
-    if max_abs > 1e6:
-        linthresh = 1.0
-        ax.set_yscale('symlog', linthresh=linthresh, linscale=1.0)
-        print(f"NOTICE: symlog y-scale activated (linthresh = {linthresh})")
-    else:
-        ax.set_ylim(-max_abs * 1.05, max_abs * 1.05)
+    # Always start with linear scale
+    ax.set_yscale('linear')
+    ax.set_ylim(-max_abs * 1.05, max_abs * 1.05)
 
     ax.set_title("Polynomial Curve and Roots in Real Domain")
     ax.set_xlabel("x")
