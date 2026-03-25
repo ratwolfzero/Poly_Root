@@ -405,11 +405,11 @@ def plot_polynomial_curve(ax, coeffs, roots_mp):
     return max_abs
 
 
-def add_interactive_scale(fig, ax, max_abs):
+def add_interactive_scale(fig, ax, init_ylim):
     def on_key(event):
         if event.key == 'l':
             ax.set_yscale('linear')
-            ax.set_ylim(-max_abs * 1.05, max_abs * 1.05)
+            ax.set_ylim(init_ylim)          # restore original limits exactly
             fig.canvas.draw_idle()
             print("Switched to linear scale")
         elif event.key == 'y':
@@ -422,22 +422,21 @@ def add_interactive_scale(fig, ax, max_abs):
 def plot_combined(coeffs, roots_mp, equation):
     if not roots_mp:
         return
-
     fig, (ax1, ax2) = plt.subplots(
         1, 2, figsize=(24, 7),
         gridspec_kw={'width_ratios': [1, 1.5]}
     )
-    fig.canvas.manager.set_window_title(
-        f"Complex Plane and Polynomial Curve")
+    fig.canvas.manager.set_window_title(f"Complex Plane and Polynomial Curve")
     fig.suptitle(f"Polynomial: {equation}", wrap=True)
 
     plot_complex_plane(ax1, roots_mp)
     max_abs = plot_polynomial_curve(ax2, coeffs, roots_mp)
 
+    # Capture the initial y‑limits after the polynomial curve is plotted
+    init_ylim = ax2.get_ylim()
+
     plt.subplots_adjust(top=0.85)
-
-    add_interactive_scale(fig, ax2, max_abs)
-
+    add_interactive_scale(fig, ax2, init_ylim)   # pass the stored limits
     plt.show()
 
 # ----------------------------- Main ----------------------------- #
