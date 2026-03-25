@@ -251,7 +251,7 @@ $(x-1)^{20}$
 
 Remark: Compare default `mp.dps = 100` with `mp.dps = 400`!
 
-### 3.1 Even and odd multiplicity
+### 3.1 Even and odd multiplicity real root
 
     1 0 -400 0 60000 0 -4000000 0 100000000 0 0 0 0
 ---
