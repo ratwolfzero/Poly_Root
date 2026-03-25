@@ -251,6 +251,12 @@ $(x-1)^{20}$
 
 Remark: Compare default `mp.dps = 100` with `mp.dps = 400`!
 
+### 3.1 Even and odd multiplicity
+
+    1 0 -400 0 60000 0 -4000000 0 100000000 0 0 0 0
+---
+    1 0 -300 0 30000 0 -1000000 0 0 0
+
 ### 4. High-multiplicity complex roots: $(x^2 + 1)^5$
 
     1 0 5 0 10 0 10 0 5 0 1
