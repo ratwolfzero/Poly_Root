@@ -2,7 +2,7 @@ from sympy import symbols, expand, prod
 
 x = symbols('x')
 
-n = 7        # number of roots
+n = 9        # number of roots
 m = 3          # multiplicity of each root
 
 roots = list(range(1, n + 1))   # [1,2,3,...,n]
