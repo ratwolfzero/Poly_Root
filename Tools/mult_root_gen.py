@@ -5,9 +5,11 @@ from math import prod
 # Format: (root, multiplicity)
 # -----------------------------
 roots_with_mult = [
-    (-1, 5),   # (x - 1)^2
-    (0, 33),   # (x - 2)^3
-    (1, 5)    # (x - 5)^1
+    (-3, 5),
+    (-1, 3),
+    (0, 7),   
+    (1, 3),
+    (3, 5),    
 ]
 
 # Optional: leading coefficient
